@@ -11,8 +11,6 @@ class grammar {
 	static constexpr int  rule_sep		= 0;
 	static constexpr char rule_sep_char = '|';
 
-	static constexpr int epsilon = std::numeric_limits<char>::max() + 1;
-
 	static grammar parse_from_file(const std::string & data);
 
 	// Returns each rule as its own vector
