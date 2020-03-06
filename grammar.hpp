@@ -1,6 +1,7 @@
 #ifndef GRAMMAR_HPP
 #define GRAMMAR_HPP
 
+#include <ios>
 #include <limits>
 #include <map>
 #include <vector>
@@ -29,8 +30,11 @@ class grammar {
    private:
 	std::map<int, char>				symbols{{rule_sep, rule_sep_char}};
 	std::map<int, std::vector<int>> rules{};
-	int								next_nonterminal = 1;
-	int								next_terminal	 = -1;
+
+	int next_nonterminal = 1;
+	int next_terminal	 = -1;
+
+	friend std::ostream & operator<<(std::ostream & lhs, const grammar & rhs);
 };
 
 #endif

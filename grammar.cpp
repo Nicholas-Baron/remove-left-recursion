@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <iostream>
 
 grammar grammar::parse_from_file(const std::string & data) {
 	grammar to_ret{};
@@ -101,4 +102,8 @@ int grammar::terminal(char symbol) {
 		next_nonterminal--;
 		return to_ret;
 	}
+}
+
+std::ostream & operator<<(std::ostream & lhs, const grammar & rhs) {
+	return lhs;
 }

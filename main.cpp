@@ -3,6 +3,8 @@
 #include <sstream>
 #include <string>
 
+#include "grammar.hpp"
+
 std::string read_file(std::ifstream && file) {
 	std::stringstream content{};
 	{
@@ -22,7 +24,11 @@ int main(int arg_count, const char ** args) {
 		}
 	}
 
-	auto data = read_file(std::ifstream{filename});
+	const auto data = read_file(std::ifstream{filename});
 
 	std::cout << data << std::flush;
+
+	auto cfg = grammar::parse_from_file(data);
+
+	std::cout << cfg << std::endl;
 }
