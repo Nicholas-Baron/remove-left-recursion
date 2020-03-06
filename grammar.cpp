@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cctype>
 #include <iostream>
+#include <iomanip>
 
 grammar grammar::parse_from_file(const std::string & data) {
 	grammar to_ret{};
@@ -106,17 +107,20 @@ int grammar::terminal(char symbol) {
 
 std::ostream & operator<<(std::ostream & lhs, const grammar & rhs) {
 
+    static constexpr auto arrow = " --> ";
+    static const auto column = std::setw(2);
+
     lhs << "Symbol mapping (Negative = terminal):\n";
     for(const auto& entry : rhs.symbols){
-        lhs << entry.first << " --> " << entry.second << '\n';
+        lhs << column << entry.first << arrow << column << entry.second << '\n';
     }
 
     lhs << "Rules:\n";
     for( const auto& entry : rhs.rules ){
-        lhs << entry.first << " --> ";
+        lhs << column << entry.first << arrow;
         for(const auto & symbol : entry.second){
-            if(symbol == grammar::rule_sep) lhs << '\t' << grammar::rule_sep_char << ' ';
-            else lhs << symbol << ' ';
+            if(symbol == grammar::rule_sep) lhs << ' ' << grammar::rule_sep_char << ' ';
+            else lhs << column << symbol << ' ';
         }
         lhs << '\n';
     }
