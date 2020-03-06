@@ -1,7 +1,7 @@
 #!/bin/bash
 
-clang-format-9 -i *.cpp *.hpp
+clang-format-9 -i ./*.cpp ./*.hpp
 pushd build
 cmake ..
-make -j$(nproc)
+make -j"$(nproc)"
 popd
