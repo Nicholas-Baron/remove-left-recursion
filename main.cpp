@@ -36,22 +36,26 @@ std::string read_cfg_data(int arg_count, const char ** args) {
 int main(int arg_count, const char ** args) {
 	const auto data = read_cfg_data(arg_count, args);
 
-	std::cout << "Grammar Read From File\n" << data << std::endl;
+	std::cout << "\nGrammar Read From File\n" << data << std::endl;
 
 	auto cfg = grammar::parse_from_file(data);
 
-	std::cout << cfg << std::endl;
+	std::cout << cfg << '\n';
 
+	std::cout << "Epsilon check\n";
 	auto nonterms = cfg.nonterminals();
 	for (auto nonterm : nonterms) {
 		std::cout << std::boolalpha << nonterm << " has epsilon? "
-				  << cfg.has_empty_production(nonterm) << std::endl;
+				  << cfg.has_empty_production(nonterm) << '\n';
 	}
 
+	std::cout << "\nCycle check\n";
 	auto cyclic = cfg.has_cycle();
 	if (cyclic) {
-		std::cout << "Found cycle" << std::endl;
+		std::cout << "Found cycle\n";
 	} else {
-		std::cout << "Could not find cycle" << std::endl;
+		std::cout << "Could not find cycle\n";
 	}
+
+	std::cout << std::endl;
 }
