@@ -16,16 +16,36 @@ class grammar {
 	static grammar parse_from_file(const std::string & data);
 
 	// Returns each rule as its own vector
-	std::vector<std::vector<int>> rule_matrix(int symbol) const;
+	std::vector<std::vector<int>> rule_matrix(char symbol) const;
 
 	auto nonterminal_count() const { return rules.size(); }
 	auto terminal_count() const {
 		return symbols.size() - (1 + nonterminal_count());
 	}
 
-	int nonterminal(char symbol);
+	int get_nonterminal(char symbol);
 
-	int terminal(char symbol);
+	int get_terminal(char symbol);
+
+    bool has_empty_production(char symbol) const;
+
+    bool is_nonterminal(char symbol) const { 
+        return isupper(symbol) and symbols.count(symbol) != 0; 
+    }
+
+    bool is_terminal(char symbol) const {
+        return islower(symbol) and symbols.count(symbol) != 0; 
+    }
+
+    std::vector<char> nonterminals() const {
+        std::vector<char> to_ret{};
+        for(const auto & entry : symbols){
+            if(isupper(entry.second)){
+                to_ret.push_back(entry.second);
+            }
+        }
+        return to_ret;
+    }
 
    private:
 	std::map<int, char>				symbols{{rule_sep, rule_sep_char}};

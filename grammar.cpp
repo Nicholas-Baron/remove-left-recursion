@@ -40,17 +40,17 @@ grammar grammar::parse_from_file(const std::string & data) {
 				if (*iter == rule_sep_char) {
 					rule_list.push_back(rule_sep);
 				} else if (isupper(*iter)) {
-					rule_list.push_back(to_ret.nonterminal(*iter));
+					rule_list.push_back(to_ret.get_nonterminal(*iter));
 				} else {
 					// lower
-					rule_list.push_back(to_ret.terminal(*iter));
+					rule_list.push_back(to_ret.get_terminal(*iter));
 				}
 			}
 
 			iter++;
 		}
 
-		to_ret.rules.emplace(to_ret.nonterminal(nonterm), std::move(rule_list));
+		to_ret.rules.emplace(to_ret.get_nonterminal(nonterm), std::move(rule_list));
 		rule_list = {};
 		iter++;
 	}
@@ -58,10 +58,10 @@ grammar grammar::parse_from_file(const std::string & data) {
 	return to_ret;
 }
 
-std::vector<std::vector<int>> grammar::rule_matrix(int symbol) const {
+std::vector<std::vector<int>> grammar::rule_matrix(char symbol) const {
 	std::vector<std::vector<int>> to_ret{{}};
 
-	const auto & all_rules = rules.at(symbol);
+	const auto & all_rules = rules.at(symbols.at(symbol));
 
 	to_ret.reserve(std::count(all_rules.begin(), all_rules.end(), 0));
 
@@ -76,7 +76,7 @@ std::vector<std::vector<int>> grammar::rule_matrix(int symbol) const {
 	return to_ret;
 }
 
-int grammar::nonterminal(char symbol) {
+int grammar::get_nonterminal(char symbol) {
 	auto iter = std::find_if(
 		symbols.begin(), symbols.end(),
 		[&](const auto & item) -> bool { return item.second == symbol; });
@@ -91,7 +91,7 @@ int grammar::nonterminal(char symbol) {
 	}
 }
 
-int grammar::terminal(char symbol) {
+int grammar::get_terminal(char symbol) {
 	auto iter = std::find_if(
 		symbols.begin(), symbols.end(),
 		[&](const auto & item) -> bool { return item.second == symbol; });
@@ -103,6 +103,20 @@ int grammar::terminal(char symbol) {
 		next_terminal--;
 		return to_ret;
 	}
+}
+
+bool grammar::has_empty_production(char symbol) const {
+    if(this->is_terminal(symbol)) return false;
+
+    const auto & rule_list = rules.at(symbol);
+    bool last_was_sep = true;
+    for(const auto & sym : rule_list){
+        if(sym == rule_sep and last_was_sep) return true;
+        else if(sym == rule_sep and not last_was_sep) last_was_sep = true;
+        else last_was_sep = false;
+    }
+
+    return false;
 }
 
 std::ostream & operator<<(std::ostream & lhs, const grammar & rhs) {

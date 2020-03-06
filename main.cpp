@@ -1,5 +1,6 @@
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 #include <sstream>
 #include <string>
 
@@ -41,4 +42,9 @@ int main(int arg_count, const char ** args) {
 	auto cfg = grammar::parse_from_file(data);
 
 	std::cout << cfg << std::endl;
+
+    auto nonterms = cfg.nonterminals();
+    for(auto nonterm : nonterms){
+        std::cout << std::boolalpha << nonterm << " has epsilon? " << cfg.has_empty_production(nonterm) << std::endl;
+    }
 }
