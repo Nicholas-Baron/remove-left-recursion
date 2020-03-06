@@ -179,6 +179,58 @@ bool grammar::has_cycle() const {
 	return false;
 }
 
+std::vector<int> grammar::cyclic_path() const {
+	// Path so far
+	std::vector<std::pair<int /*symbol*/, int /*option*/>> path{};
+
+	int start_symbol = 1;
+
+	while (start_symbol < nonterminal_count()) {
+		// Pick start point
+		if (path.empty()) {
+			path.emplace_back(start_symbol, -1);
+			start_symbol++;
+		}
+
+		// Read the options of the path and which option to chose
+		const auto & options   = rules.at(path.back().first);
+		auto		 rule_used = path.back().second + 1;
+
+		const auto old_path_length = path.size();
+		while (path.size() == old_path_length) {
+			if (rule_used < options.size() and options.at(rule_used) > 0
+				and (rule_used == options.size() - 1
+					 or options.at(rule_used + 1) == rule_sep)) {
+				// found a valid rule to use
+				path.back().second = rule_used;
+				path.emplace_back(options.at(rule_used), -1);
+			} else {
+				// move to the next valid rule
+				while (rule_used < options.size()
+					   and options.at(rule_used) != rule_sep)
+					rule_used++;
+				rule_used++;
+				if (rule_used >= options.size()) {
+					// used all options -> go back
+					path.pop_back();
+				}
+			}
+		}
+
+		// Check the path for repeats
+		std::set<int> seen_nonterminals{};
+		for (const auto & entry : path)
+			if (seen_nonterminals.count(entry.first) != 0) {
+				std::vector<int> to_ret(path.size(), -1);
+				std::transform(path.begin(), path.end(), to_ret.begin(),
+							   [](const auto & entry) { return entry.first; });
+				return to_ret;
+			} else
+				seen_nonterminals.insert(entry.first);
+	}
+
+	return {};
+}
 bool grammar::using_symbol(char symbol) const {
 	return std::find_if(
 			   symbols.begin(), symbols.end(),

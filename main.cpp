@@ -50,9 +50,18 @@ int main(int arg_count, const char ** args) {
 	}
 
 	std::cout << "\nCycle check\n";
-	auto cyclic = cfg.has_cycle();
-	if (cyclic) {
+	const auto cycle_path = cfg.cyclic_path();
+	if (not cycle_path.empty()) {
 		std::cout << "Found cycle\n";
+		bool print_arrow = false;
+		for (const auto & node : cycle_path) {
+			if (print_arrow)
+				std::cout << " --> ";
+			else
+				print_arrow = true;
+			std::cout << node;
+		}
+		std::cout << '\n';
 	} else {
 		std::cout << "Could not find cycle\n";
 	}

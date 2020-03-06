@@ -31,6 +31,10 @@ class grammar {
 
 	bool has_cycle() const;
 
+	// Prints one possible cycle path
+	// Empty if could not find one
+	std::vector<int> cyclic_path() const;
+
 	bool using_symbol(char symbol) const;
 
 	bool is_nonterminal_symbol(char symbol) const {
