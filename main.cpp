@@ -5,7 +5,7 @@
 
 #include "grammar.hpp"
 
-std::string read_file(std::ifstream && file) {
+std::string read_file(std::istream && file) {
 	std::stringstream content{};
 	{
 		std::string line;
@@ -26,7 +26,7 @@ int main(int arg_count, const char ** args) {
 
 	const auto data = read_file(std::ifstream{filename});
 
-	std::cout << data << std::flush;
+	std::cout << data << std::endl;
 
 	auto cfg = grammar::parse_from_file(data);
 

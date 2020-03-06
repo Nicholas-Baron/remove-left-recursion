@@ -99,11 +99,27 @@ int grammar::terminal(char symbol) {
 	} else {
 		const auto to_ret = next_terminal;
 		symbols[to_ret]	  = symbol;
-		next_nonterminal--;
+		next_terminal--;
 		return to_ret;
 	}
 }
 
 std::ostream & operator<<(std::ostream & lhs, const grammar & rhs) {
+
+    lhs << "Symbol mapping (Negative = terminal):\n";
+    for(const auto& entry : rhs.symbols){
+        lhs << entry.first << " --> " << entry.second << '\n';
+    }
+
+    lhs << "Rules:\n";
+    for( const auto& entry : rhs.rules ){
+        lhs << entry.first << " --> ";
+        for(const auto & symbol : entry.second){
+            if(symbol == grammar::rule_sep) lhs << '\t' << grammar::rule_sep_char << ' ';
+            else lhs << symbol << ' ';
+        }
+        lhs << '\n';
+    }
+
 	return lhs;
 }
