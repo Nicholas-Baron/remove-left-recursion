@@ -111,11 +111,13 @@ int grammar::get_terminal(char symbol) {
 bool grammar::has_empty_production(int nonterminal) const {
 	if (nonterminal <= 0) return false;
 
-	const auto & rule_list	  = rules.at(nonterminal);
-	bool		 last_was_sep = true;
+	const auto & rule_list = rules.at(nonterminal);
+
+	// An inital separator = empty production
+	bool last_was_sep = true;
 	for (const auto & sym : rule_list) {
 		if (sym == rule_sep and last_was_sep)
-			return true;
+			return true;  // Pipes surrounding nothing = empty production
 		else if (sym == rule_sep and not last_was_sep)
 			last_was_sep = true;
 		else
