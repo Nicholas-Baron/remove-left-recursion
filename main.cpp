@@ -47,4 +47,11 @@ int main(int arg_count, const char ** args) {
 		std::cout << std::boolalpha << nonterm << " has epsilon? "
 				  << cfg.has_empty_production(nonterm) << std::endl;
 	}
+
+	auto cyclic = cfg.has_cycle();
+	if (cyclic) {
+		std::cout << "Found cycle" << std::endl;
+	} else {
+		std::cout << "Could not find cycle" << std::endl;
+	}
 }

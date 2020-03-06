@@ -29,6 +29,8 @@ class grammar {
 
 	bool has_empty_production(int nonterminal) const;
 
+	bool has_cycle() const;
+
 	bool using_symbol(char symbol) const;
 
 	bool is_nonterminal_symbol(char symbol) const {
