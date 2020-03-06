@@ -130,9 +130,9 @@ bool grammar::has_empty_production(int nonterminal) const {
 
 bool grammar::has_cycle() const {
 	// Path so far
-	std::vector<std::pair<int /*symbol*/, int /*option*/>> path{};
+	std::vector<std::pair<size_t /*symbol*/, size_t /*option*/>> path{};
 
-	int start_symbol = 1;
+	size_t start_symbol = 1;
 
 	while (start_symbol < nonterminal_count()) {
 		// Pick start point
@@ -180,9 +180,9 @@ bool grammar::has_cycle() const {
 
 std::vector<int> grammar::cyclic_path() const {
 	// Path so far
-	std::vector<std::pair<int /*symbol*/, int /*option*/>> path{};
+	std::vector<std::pair<size_t /*symbol*/, size_t /*option*/>> path{};
 
-	int start_symbol = 1;
+	size_t start_symbol = 1;
 
 	while (start_symbol < nonterminal_count()) {
 		// Pick start point

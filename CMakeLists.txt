@@ -8,3 +8,4 @@ add_executable(check_grammar
     )
 
 set_property(TARGET check_grammar PROPERTY CXX_STANDARD 17)
+target_compile_options(check_grammar PRIVATE -Wall -Wextra)
