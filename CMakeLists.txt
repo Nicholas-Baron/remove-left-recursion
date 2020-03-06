@@ -7,4 +7,4 @@ add_executable(check_grammar
     grammar.cpp
     )
 
-set_property(TARGET check_grammar PROPERTY CXX_STANDARD 14)
+set_property(TARGET check_grammar PROPERTY CXX_STANDARD 17)
