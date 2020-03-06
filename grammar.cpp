@@ -9,7 +9,7 @@
 grammar grammar::parse_from_file(const std::string & data) {
 	grammar to_ret{};
 	auto	iter	= data.begin();
-	char	nonterm = 0;
+	int		nonterm = 0;
 
 	const auto consume_whitespace = [&iter, &data]() {
 		while (iter != data.end() and isspace(*iter) and *iter != '\n') iter++;
@@ -22,7 +22,7 @@ grammar grammar::parse_from_file(const std::string & data) {
 
 		// Read initial symbol
 		if (isupper(*iter) and to_ret.symbols.count(*iter) == 0) {
-			nonterm = *iter;
+			nonterm = to_ret.get_nonterminal(*iter);
 			iter++;
 		}
 
@@ -51,8 +51,7 @@ grammar grammar::parse_from_file(const std::string & data) {
 			iter++;
 		}
 
-		to_ret.rules.emplace(to_ret.get_nonterminal(nonterm),
-							 std::move(rule_list));
+		to_ret.rules.emplace(nonterm, std::move(rule_list));
 		rule_list = {};
 		iter++;
 	}
