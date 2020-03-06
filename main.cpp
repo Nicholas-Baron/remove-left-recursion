@@ -1,6 +1,6 @@
 #include <fstream>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 #include <sstream>
 #include <string>
 
@@ -15,7 +15,7 @@ std::string read_file(std::istream & file) {
 	return content.str();
 }
 
-std::string read_cfg_data(int arg_count, const char** args){
+std::string read_cfg_data(int arg_count, const char ** args) {
 	std::string filename;
 	{
 		int arg_num = 1;
@@ -25,13 +25,12 @@ std::string read_cfg_data(int arg_count, const char** args){
 		}
 	}
 
-    if(filename.empty() or filename == "-" or filename == "--"){
-        return read_file(std::cin);
-    }else{
-        std::ifstream file{filename};
-        return read_file(file);
-    }
-
+	if (filename.empty() or filename == "-" or filename == "--") {
+		return read_file(std::cin);
+	} else {
+		std::ifstream file{filename};
+		return read_file(file);
+	}
 }
 
 int main(int arg_count, const char ** args) {
@@ -43,8 +42,9 @@ int main(int arg_count, const char ** args) {
 
 	std::cout << cfg << std::endl;
 
-    auto nonterms = cfg.nonterminals();
-    for(auto nonterm : nonterms){
-        std::cout << std::boolalpha << nonterm << " has epsilon? " << cfg.has_empty_production(nonterm) << std::endl;
-    }
+	auto nonterms = cfg.nonterminals();
+	for (auto nonterm : nonterms) {
+		std::cout << std::boolalpha << nonterm << " has epsilon? "
+				  << cfg.has_empty_production(nonterm) << std::endl;
+	}
 }

@@ -16,7 +16,7 @@ class grammar {
 	static grammar parse_from_file(const std::string & data);
 
 	// Returns each rule as its own vector
-	std::vector<std::vector<int>> rule_matrix(char symbol) const;
+	std::vector<std::vector<int>> rule_matrix(int nonterminal) const;
 
 	auto nonterminal_count() const { return rules.size(); }
 	auto terminal_count() const {
@@ -27,25 +27,25 @@ class grammar {
 
 	int get_terminal(char symbol);
 
-    bool has_empty_production(char symbol) const;
+	bool has_empty_production(int nonterminal) const;
 
-    bool is_nonterminal(char symbol) const { 
-        return isupper(symbol) and symbols.count(symbol) != 0; 
-    }
+	bool using_symbol(char symbol) const;
 
-    bool is_terminal(char symbol) const {
-        return islower(symbol) and symbols.count(symbol) != 0; 
-    }
+	bool is_nonterminal_symbol(char symbol) const {
+		return isupper(symbol) and this->using_symbol(symbol);
+	}
 
-    std::vector<char> nonterminals() const {
-        std::vector<char> to_ret{};
-        for(const auto & entry : symbols){
-            if(isupper(entry.second)){
-                to_ret.push_back(entry.second);
-            }
-        }
-        return to_ret;
-    }
+	bool is_terminal_symbol(char symbol) const {
+		return islower(symbol) and this->using_symbol(symbol);
+	}
+
+	std::vector<int> nonterminals() const {
+		std::vector<int> to_ret{};
+		for (const auto & entry : symbols) {
+			if (entry.first > 0) { to_ret.push_back(entry.first); }
+		}
+		return to_ret;
+	}
 
    private:
 	std::map<int, char>				symbols{{rule_sep, rule_sep_char}};

@@ -2,8 +2,8 @@
 
 #include <algorithm>
 #include <cctype>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 
 grammar grammar::parse_from_file(const std::string & data) {
 	grammar to_ret{};
@@ -50,7 +50,8 @@ grammar grammar::parse_from_file(const std::string & data) {
 			iter++;
 		}
 
-		to_ret.rules.emplace(to_ret.get_nonterminal(nonterm), std::move(rule_list));
+		to_ret.rules.emplace(to_ret.get_nonterminal(nonterm),
+							 std::move(rule_list));
 		rule_list = {};
 		iter++;
 	}
@@ -58,18 +59,20 @@ grammar grammar::parse_from_file(const std::string & data) {
 	return to_ret;
 }
 
-std::vector<std::vector<int>> grammar::rule_matrix(char symbol) const {
+std::vector<std::vector<int>> grammar::rule_matrix(int nonterminal) const {
 	std::vector<std::vector<int>> to_ret{{}};
 
-	const auto & all_rules = rules.at(symbols.at(symbol));
+	if (rules.count(nonterminal) != 0) {
+		const auto & all_rules = rules.at(nonterminal);
 
-	to_ret.reserve(std::count(all_rules.begin(), all_rules.end(), 0));
+		to_ret.reserve(std::count(all_rules.begin(), all_rules.end(), 0));
 
-	for (const auto & symbol : all_rules) {
-		if (symbol == rule_sep) {
-			to_ret.emplace_back();
-		} else {
-			to_ret.back().push_back(symbol);
+		for (const auto & symbol : all_rules) {
+			if (symbol == rule_sep) {
+				to_ret.emplace_back();
+			} else {
+				to_ret.back().push_back(symbol);
+			}
 		}
 	}
 
@@ -105,39 +108,50 @@ int grammar::get_terminal(char symbol) {
 	}
 }
 
-bool grammar::has_empty_production(char symbol) const {
-    if(this->is_terminal(symbol)) return false;
+bool grammar::has_empty_production(int nonterminal) const {
+	if (nonterminal <= 0) return false;
 
-    const auto & rule_list = rules.at(symbol);
-    bool last_was_sep = true;
-    for(const auto & sym : rule_list){
-        if(sym == rule_sep and last_was_sep) return true;
-        else if(sym == rule_sep and not last_was_sep) last_was_sep = true;
-        else last_was_sep = false;
-    }
+	const auto & rule_list	  = rules.at(nonterminal);
+	bool		 last_was_sep = true;
+	for (const auto & sym : rule_list) {
+		if (sym == rule_sep and last_was_sep)
+			return true;
+		else if (sym == rule_sep and not last_was_sep)
+			last_was_sep = true;
+		else
+			last_was_sep = false;
+	}
 
-    return false;
+	// Separator at the end = empty production
+	return last_was_sep;
+}
+bool grammar::using_symbol(char symbol) const {
+	return std::find_if(
+			   symbols.begin(), symbols.end(),
+			   [&symbol](auto & entry) { return entry.second == symbol; })
+		   != symbols.end();
 }
 
 std::ostream & operator<<(std::ostream & lhs, const grammar & rhs) {
+	static constexpr auto arrow	 = " --> ";
+	static const auto	  column = std::setw(2);
 
-    static constexpr auto arrow = " --> ";
-    static const auto column = std::setw(2);
+	lhs << "Symbol mapping (Negative = terminal):\n";
+	for (const auto & entry : rhs.symbols) {
+		lhs << column << entry.first << arrow << column << entry.second << '\n';
+	}
 
-    lhs << "Symbol mapping (Negative = terminal):\n";
-    for(const auto& entry : rhs.symbols){
-        lhs << column << entry.first << arrow << column << entry.second << '\n';
-    }
-
-    lhs << "Rules:\n";
-    for( const auto& entry : rhs.rules ){
-        lhs << column << entry.first << arrow;
-        for(const auto & symbol : entry.second){
-            if(symbol == grammar::rule_sep) lhs << ' ' << grammar::rule_sep_char << ' ';
-            else lhs << column << symbol << ' ';
-        }
-        lhs << '\n';
-    }
+	lhs << "Rules:\n";
+	for (const auto & entry : rhs.rules) {
+		lhs << column << entry.first << arrow;
+		for (const auto & symbol : entry.second) {
+			if (symbol == grammar::rule_sep)
+				lhs << ' ' << grammar::rule_sep_char << ' ';
+			else
+				lhs << column << symbol << ' ';
+		}
+		lhs << '\n';
+	}
 
 	return lhs;
 }
