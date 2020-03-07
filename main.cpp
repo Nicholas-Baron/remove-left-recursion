@@ -10,7 +10,7 @@ std::string read_file(std::istream & file) {
 	std::stringstream content{};
 	{
 		std::string line;
-		while (std::getline(file, line)) content << line << '\n';
+		while (std::getline(file, line)) { content << line << '\n'; }
 	}
 	return content.str();
 }
@@ -20,7 +20,7 @@ std::string read_cfg_data(int arg_count, const char ** args) {
 	{
 		int arg_num = 1;
 		while (args[arg_num] != nullptr) {
-			if (arg_num == arg_count - 1) filename = args[arg_num];
+			if (arg_num == arg_count - 1) { filename = args[arg_num]; }
 			arg_num++;
 		}
 	}
@@ -55,10 +55,11 @@ int main(int arg_count, const char ** args) {
 		std::cout << "Found cycle\n";
 		bool print_arrow = false;
 		for (const auto & node : cycle_path) {
-			if (print_arrow)
+			if (print_arrow) {
 				std::cout << " --> ";
-			else
+			} else {
 				print_arrow = true;
+			}
 			std::cout << node;
 		}
 		std::cout << '\n';
