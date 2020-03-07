@@ -8,8 +8,9 @@
 
 grammar grammar::parse_from_file(const std::string & data) {
 	grammar to_ret{};
-	auto	iter	= data.begin();
-	int		nonterm = 0;
+	auto	iter		   = data.begin();
+	int		nonterm		   = 0;
+	char	nonterm_symbol = ' ';
 
 	const auto consume_whitespace = [&iter, &data]() {
 		while (iter != data.end() and isspace(*iter) and *iter != '\n') iter++;
@@ -22,7 +23,8 @@ grammar grammar::parse_from_file(const std::string & data) {
 
 		// Read initial symbol
 		if (isupper(*iter) and to_ret.symbols.count(*iter) == 0) {
-			nonterm = to_ret.get_nonterminal(*iter);
+			nonterm		   = to_ret.get_nonterminal(*iter);
+			nonterm_symbol = *iter;
 			iter++;
 		} else {
 			std::cerr
@@ -34,7 +36,15 @@ grammar grammar::parse_from_file(const std::string & data) {
 		consume_whitespace();
 
 		// consume all hyphens
-		while (iter != data.end() and *iter == '-') { iter++; }
+		bool ate_hyphen = false;
+		while (iter != data.end() and *iter == '-') {
+			iter++;
+			ate_hyphen = true;
+		}
+		if (not ate_hyphen) {
+			std::cerr << "Expected some hyphens after nonterminal "
+					  << nonterm_symbol << '\n';
+		}
 
 		// remove whitespace
 		consume_whitespace();
