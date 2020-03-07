@@ -84,9 +84,9 @@ std::vector<std::vector<int>> grammar::rule_matrix(int nonterminal) const {
 }
 
 int grammar::get_nonterminal(char symbol) {
-	auto iter = std::find_if(
+	const auto iter = std::find_if(
 		symbols.begin(), symbols.end(),
-		[&](const auto & item) -> bool { return item.second == symbol; });
+		[symbol](const auto & item) { return item.second == symbol; });
 	if (iter != symbols.end()) {
 		return iter->first;
 	} else {
@@ -99,9 +99,9 @@ int grammar::get_nonterminal(char symbol) {
 }
 
 int grammar::get_terminal(char symbol) {
-	auto iter = std::find_if(
+	const auto iter = std::find_if(
 		symbols.begin(), symbols.end(),
-		[&](const auto & item) -> bool { return item.second == symbol; });
+		[symbol](const auto & item) { return item.second == symbol; });
 	if (iter != symbols.end()) {
 		return iter->first;
 	} else {
@@ -237,7 +237,7 @@ std::vector<int> grammar::cyclic_path() const {
 bool grammar::using_symbol(char symbol) const {
 	return std::find_if(
 			   symbols.begin(), symbols.end(),
-			   [&symbol](auto & entry) { return entry.second == symbol; })
+			   [symbol](const auto & entry) { return entry.second == symbol; })
 		   != symbols.end();
 }
 
