@@ -132,10 +132,8 @@ bool grammar::has_empty_production(int nonterminal) const {
 	for (const auto & sym : rule_list) {
 		if (sym == rule_sep and last_was_sep)
 			return true;  // Pipes surrounding nothing = empty production
-		else if (sym == rule_sep and not last_was_sep)
-			last_was_sep = true;
 		else
-			last_was_sep = false;
+			last_was_sep = sym == rule_sep;
 	}
 
 	// Separator at the end = empty production
