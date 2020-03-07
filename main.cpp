@@ -43,8 +43,8 @@ int main(int arg_count, const char ** args) {
 	std::cout << cfg << '\n';
 
 	std::cout << "Epsilon check\n";
-	auto nonterms = cfg.nonterminals();
-	for (auto nonterm : nonterms) {
+	const auto nonterms = cfg.nonterminals();
+	for (const auto & nonterm : nonterms) {
 		std::cout << std::boolalpha << nonterm << " has epsilon? "
 				  << cfg.has_empty_production(nonterm) << '\n';
 	}
