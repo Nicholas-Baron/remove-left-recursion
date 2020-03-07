@@ -24,6 +24,10 @@ grammar grammar::parse_from_file(const std::string & data) {
 		if (isupper(*iter) and to_ret.symbols.count(*iter) == 0) {
 			nonterm = to_ret.get_nonterminal(*iter);
 			iter++;
+		} else {
+			std::cerr
+				<< "Cannot use " << *iter
+				<< " as a nonterminal\nNonterminals must be capitalized\n";
 		}
 
 		// remove whitespace between symbol and hyphen

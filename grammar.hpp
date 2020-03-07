@@ -6,6 +6,9 @@
 #include <map>
 #include <vector>
 
+// This class stores the grammar, while allowing some higher level manipulations
+// on it. The nonterminals are the positive numbers, while the terminals are the
+// negative numbers.
 class grammar {
    public:
 	static constexpr int  rule_sep		= 0;
