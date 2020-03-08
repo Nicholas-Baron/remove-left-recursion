@@ -54,6 +54,10 @@ class grammar {
 		return to_ret;
 	}
 
+	void change_rules(int symbol, std::vector<int> && new_rules) {
+		rules.at(symbol) = std::move(new_rules);
+	}
+
    private:
 	std::map<int, char>				symbols{{rule_sep, rule_sep_char}};
 	std::map<int, std::vector<int>> rules{};
