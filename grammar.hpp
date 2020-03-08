@@ -55,7 +55,7 @@ class grammar {
 	}
 
 	void change_rules(int symbol, std::vector<int> && new_rules) {
-		rules.at(symbol) = std::move(new_rules);
+		if (rules.count(symbol) != 0) rules.at(symbol) = std::move(new_rules);
 	}
 
    private:
