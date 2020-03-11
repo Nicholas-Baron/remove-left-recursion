@@ -154,14 +154,15 @@ std::vector<int> grammar::cyclic_path() const {
 		}
 
 		// Read the options of the path and which option to chose
-		const auto & options   = rules.at(path.back().first);
-		auto		 rule_used = path.back().second + 1;
+		const auto & current_symbol = path.back().first;
+		const auto & options		= rules.at(current_symbol);
+		auto		 rule_used		= path.back().second + 1;
 
 		const auto old_path_length = path.size();
 		while (path.size() == old_path_length) {
 			if (rule_used < options.size() and options.at(rule_used) > 0
-				and (rule_used == options.size() - 1
-					 or options.at(rule_used + 1) == rule_sep)) {
+				and static_cast<size_t>(options.at(rule_used)) != current_symbol
+				and (rule_used == 0 or options.at(rule_used - 1) == rule_sep)) {
 				// found a valid rule to use
 				path.back().second = rule_used;
 				path.emplace_back(options.at(rule_used), -1);
