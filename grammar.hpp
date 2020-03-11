@@ -30,7 +30,7 @@ class grammar {
 
 	bool has_empty_production(int nonterminal) const;
 
-	bool has_cycle() const;
+	bool has_cycle() const { return this->cyclic_path().size() > 0; }
 
 	// Prints one possible cycle path
 	// Empty if could not find one
