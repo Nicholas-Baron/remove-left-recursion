@@ -160,9 +160,16 @@ std::vector<int> grammar::cyclic_path() const {
 
 		const auto old_path_length = path.size();
 		while (path.size() == old_path_length) {
-			if (rule_used < options.size() and options.at(rule_used) > 0
+			if (rule_used < options.size()
+				and options.at(rule_used) > 0
+				// the rule used is pointing at a nonterminal
 				and static_cast<size_t>(options.at(rule_used)) != current_symbol
-				and (rule_used == 0 or options.at(rule_used - 1) == rule_sep)) {
+				// the rule is not generating the same symbol
+				and (rule_used == 0 /*there is nothing to the left of us*/
+					 or options.at(rule_used - 1) == rule_sep
+					 /*the left is a rule separator*/)
+				and (rule_used == options.size() - 1
+					 or options.at(rule_used + 1) == rule_sep)) {
 				// found a valid rule to use
 				path.back().second = rule_used;
 				path.emplace_back(options.at(rule_used), -1);
