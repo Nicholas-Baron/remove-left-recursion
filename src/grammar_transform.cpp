@@ -8,7 +8,6 @@ using token_t = grammar::token_t;
 
 std::optional<grammar> remove_left_recursion(const grammar & input) {
 	// Preconditions: input has no empty productions and no cycles
-	std::cout << "Removing left recursion\nInput:\n" << input << '\n';
 
 	if (input.has_any_empty_production()) {
 		std::cerr << "Input grammar has an empty production.\n";
@@ -51,28 +50,36 @@ std::optional<grammar> remove_left_recursion(const grammar & input) {
 
 		for (const auto & rule_i : rule_matrix_i) {
 			std::vector<token_t> result_rule;
+			bool				 removed_recursion = false;
 
-			for (auto j = 0ul; i != 0 and j <= i - 1; j++) {
-				auto nonterm_j = nonterms.at(j);
+			if (i != 0)
+				for (auto j = 0ul; j < i and not removed_recursion; j++) {
+					auto nonterm_j = nonterms.at(j);
 
-				// Replace A_i -> A_j g with A_i -> d_n g where A_j -> d_n
-				if (not rule_i.empty() and rule_i.front() == nonterm_j) {
-					auto rule_matrix_j = output.rule_matrix(nonterm_j);
-					for (const auto & rule_j : rule_matrix_j) {
-						auto & rule = result_matrix.emplace_back(rule_j);
+					// Replace A_i -> A_j g with A_i -> d_n g where A_j -> d_n
+					if (not rule_i.empty() and rule_i.front() == nonterm_j) {
+						auto rule_matrix_j = output.rule_matrix(nonterm_j);
+						for (const auto & rule_j : rule_matrix_j) {
+							std::copy(rule_j.cbegin(), rule_j.cend(),
+									  std::back_inserter(result_rule));
 
-						bool first = true;
-						for (const auto & item : rule_i)
-							if (first)
-								first = false;
-							else
-								rule.push_back(item);
+							bool first = true;
+							for (const auto & item : rule_i)
+								if (first)
+									first = false;
+								else
+									result_rule.push_back(item);
+
+							result_matrix.push_back(std::move(result_rule));
+							result_rule = {};
+						}
+						removed_recursion = true;
 					}
-					break;
 				}
-			}
 
-			result_matrix.push_back(result_rule.empty() ? rule_i : result_rule);
+			if (not removed_recursion)
+				result_matrix.push_back(result_rule.empty() ? rule_i
+															: result_rule);
 		}
 
 		if (result_matrix.empty()) result_matrix = rule_matrix_i;
