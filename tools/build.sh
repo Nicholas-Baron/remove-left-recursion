@@ -5,7 +5,8 @@ for file in src/*.{cpp,hpp}; do
     clang-format-9 -i "$file"
 done
 clear
-pushd build
+
+pushd build || { echo "Making build directory" && mkdir build && cd build || exit ; }
 cmake ..
 make -j"$(nproc)"
-popd
+popd || exit
