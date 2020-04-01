@@ -1,6 +1,6 @@
 #!/bin/sh
 
-./build.sh
+./build.sh || exit
 
 for file in tests/*; do
     echo "$file"
