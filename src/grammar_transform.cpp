@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <iostream>
 
+using token_t = grammar::token_t;
+
 std::optional<grammar> remove_left_recursion(const grammar & input) {
 	// Preconditions: input has no empty productions and no cycles
 	std::cout << "Removing left recursion\nInput:\n" << input << '\n';
@@ -45,10 +47,10 @@ std::optional<grammar> remove_left_recursion(const grammar & input) {
 		auto	   nonterm_i	 = nonterms.at(i);
 		const auto rule_matrix_i = input.rule_matrix(nonterm_i);
 		const auto nonterm_i_sym = input_nonterm_keys.at(nonterm_i);
-		std::vector<std::vector<int>> result_matrix{};
+		std::vector<std::vector<token_t>> result_matrix{};
 
 		for (const auto & rule_i : rule_matrix_i) {
-			std::vector<int> result_rule;
+			std::vector<token_t> result_rule;
 
 			for (auto j = 0ul; i != 0 and j <= i - 1; j++) {
 				auto nonterm_j = nonterms.at(j);
@@ -100,8 +102,8 @@ std::optional<grammar> remove_left_recursion(const grammar & input) {
 				nonterm_i = remapped_nonterm_i;
 			}
 
-			std::vector<int> full_rule_i;
-			std::vector<int> full_rule_new;
+			std::vector<token_t> full_rule_i;
+			std::vector<token_t> full_rule_new;
 
 			for (const auto & rule : result_matrix) {
 				if (rule.empty()) {
@@ -128,12 +130,13 @@ std::optional<grammar> remove_left_recursion(const grammar & input) {
 					full_rule_i.push_back(new_nonterm);
 				}
 			}
+
 			output.add_rule(nonterm_i_sym, std::move(full_rule_i));
 			output.add_rule(new_nonterm_sym, std::move(full_rule_new));
 
 		} else {
-			std::vector<int> full_rule;
-			bool			 first = true;
+			std::vector<token_t> full_rule;
+			bool				 first = true;
 			for (const auto & rule : result_matrix) {
 				if (first) {
 					first = false;

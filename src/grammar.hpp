@@ -2,9 +2,10 @@
 #define GRAMMAR_HPP
 
 #include <ios>
-#include <limits>
 #include <map>
 #include <vector>
+
+#include "strong_types.hpp"
 
 // This class stores the grammar, while allowing some higher level manipulations
 // on it. The nonterminals are the positive numbers, while the terminals are the
@@ -12,25 +13,28 @@
 class grammar {
 	// TODO: Write replace_rule
 
+	struct token_tag {};
+	struct symbol_tag {};
+
    public:
 	// A token is the internal representation
 	// of a nonterminal, terminal, or the rule seperator.
 	// It is exposed as part of the interface for strong typing support.
-	using token_t = int;
+	using token_t = strong_t<int, token_tag>;
 
 	// A symbol is the printable version
 	// of a nonterminal, terminal, or the rule seperator.
 	// It is exposed as part of the interface for strong typing support.
-	using symbol_t = char;
+	using symbol_t = strong_t<char, symbol_tag>;
 
-	static constexpr token_t  rule_sep		= 0;
-	static constexpr symbol_t rule_sep_char = '|';
+	static constexpr token_t  rule_sep{0};
+	static constexpr symbol_t rule_sep_char{'|'};
 
 	static grammar empty() { return grammar{}; }
 	static grammar parse_from_file(const std::string & data);
 
 	// Returns each rule as its own vector
-	std::vector<std::vector<token_t>> rule_matrix(int nonterminal) const;
+	std::vector<std::vector<token_t>> rule_matrix(token_t nonterminal) const;
 
 	auto nonterminal_count() const { return rules.size(); }
 	auto terminal_count() const {
@@ -59,11 +63,13 @@ class grammar {
 	bool using_symbol(symbol_t symbol) const;
 
 	bool is_nonterminal_symbol(symbol_t symbol) const {
-		return isupper(symbol) and this->using_symbol(symbol);
+		return isupper(static_cast<char>(symbol))
+			   and this->using_symbol(symbol);
 	}
 
 	bool is_terminal_symbol(symbol_t symbol) const {
-		return islower(symbol) and this->using_symbol(symbol);
+		return islower(static_cast<char>(symbol))
+			   and this->using_symbol(symbol);
 	}
 
 	std::vector<token_t> nonterminals() const {
@@ -120,7 +126,7 @@ class grammar {
 			}
 
 			return true;
-		} else if (isupper(symbol)) {
+		} else if (isupper(static_cast<char>(symbol))) {
 			auto nonterm = this->get_nonterminal(symbol);
 			rules.emplace(nonterm, std::move(rule));
 			return true;
