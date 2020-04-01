@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(remove_left_recurse)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -Og -g")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O")
+
+project(remove_left_recurse CXX)
 
 add_executable(check_grammar
         src/main.cpp
@@ -9,4 +13,3 @@ add_executable(check_grammar
     )
 
 set_property(TARGET check_grammar PROPERTY CXX_STANDARD 17)
-target_compile_options(check_grammar PRIVATE -Wall -Wextra)
