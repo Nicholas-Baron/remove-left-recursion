@@ -5,6 +5,7 @@ project(remove_left_recurse)
 add_executable(check_grammar
     main.cpp
     grammar.cpp
+    grammar_transform.cpp
     )
 
 set_property(TARGET check_grammar PROPERTY CXX_STANDARD 17)
