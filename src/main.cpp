@@ -50,7 +50,7 @@ int main(int arg_count, const char ** args) {
 				  << cfg.has_empty_production(nonterm) << '\n';
 	}
 
-	std::cout << "\nCycle check\n";
+	std::cout << "\nCycle check" << std::endl;
 	const auto cycle_path = cfg.cyclic_path();
 	if (not cycle_path.empty()) {
 		std::cout << "Found cycle\n";
