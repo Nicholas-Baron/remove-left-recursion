@@ -87,17 +87,17 @@ std::optional<grammar> remove_left_recursion(const grammar & input) {
 		// Either a rule had to have left recursion removed
 		// or it was copied wholesale from the input grammar.
 
-		std::cout << "Before immediate recursion removal for nonterm " << nonterm_i
-				  << "(sym " << nonterm_i_sym << "):\n";
+		std::cout << "Before immediate recursion removal for nonterm "
+				  << nonterm_i << "(sym " << nonterm_i_sym << "):\n";
 		for (auto & row : result_matrix) {
 			for (auto & item : row) std::cout << ' ' << item;
 			std::cout << '\n';
 		}
 
 		// Remove immediate left recursion
-		bool has_left_recursion = std::any_of(
+		const bool has_left_recursion = std::any_of(
 			result_matrix.begin(), result_matrix.end(),
-			[&nonterm_i](const auto & rule) -> bool {
+			[&nonterm_i](const auto & rule) {
 				return not rule.empty() and rule.front() == nonterm_i;
 			});
 
@@ -116,9 +116,9 @@ std::optional<grammar> remove_left_recursion(const grammar & input) {
 			std::vector<token_t> full_rule_new;
 
 			for (const auto & rule : result_matrix) {
-				if (rule.empty()) {
+				if (rule.empty())
 					full_rule_i.push_back(grammar::rule_sep);
-				} else if (rule.front() == nonterm_i) {
+				else if (rule.front() == nonterm_i) {
 					bool first = true;
 					full_rule_new.push_back(grammar::rule_sep);
 					// skip the first element, copy the left recursive rule into
@@ -148,11 +148,11 @@ std::optional<grammar> remove_left_recursion(const grammar & input) {
 			std::vector<token_t> full_rule;
 			bool				 first = true;
 			for (const auto & rule : result_matrix) {
-				if (first) {
+				if (first)
 					first = false;
-				} else {
+				else
 					full_rule.push_back(grammar::rule_sep);
-				}
+
 				for (auto sym : rule) full_rule.push_back(sym);
 			}
 
