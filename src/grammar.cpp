@@ -11,14 +11,54 @@ using token_t  = grammar::token_t;
 using symbol_t = grammar::symbol_t;
 using rule_t   = std::vector<token_t>;
 
-grammar grammar::parse_from_file(const std::string & data) {
-	grammar to_ret{};
-	auto	iter		   = data.begin();
-	int		nonterm		   = 0;
-	char	nonterm_symbol = ' ';
+std::optional<grammar> grammar::parse_from_file(const std::string & data) {
+	grammar		to_ret{};
+	auto		iter = data.begin();
+	token_t		nonterm{0};
+	std::string nonterm_symbol;
+	size_t		line_num = 1;
 
-	const auto consume_whitespace = [&iter, &data]() {
+	const auto consume_whitespace = [&iter, &data] {
 		while (iter != data.end() and isspace(*iter) and *iter != '\n') iter++;
+	};
+
+	const auto error = [&line_num]() -> std::ostream & {
+		return std::cerr << "Line " << std::setw(2) << line_num << " : ";
+	};
+
+	const auto consume_symbol
+		= [&iter, &data, &consume_whitespace]() -> std::optional<std::string> {
+		if (std::string symbol; iter != data.end()) {
+			consume_whitespace();
+
+			if (*iter == '<') {
+				// time to eat a whole symbol
+				do {
+					symbol += *iter;
+					++iter;
+
+					if (*iter == '<' or *iter == ';'
+						or *iter == grammar::rule_sep) {
+						std::cerr << "Cannot use ';', '<', or '|' in a symbol "
+									 "name\nOffending name:"
+								  << symbol << std::endl;
+						return std::optional<std::string>{};
+					}
+				} while (*iter != '>');
+
+				// Append the '>'
+				iter++;
+				symbol += '>';
+				return {symbol};
+			} else {
+				auto sym = *iter;
+				iter++;
+				return {std::string(1, sym)};
+			}
+		}
+
+		std::cerr << "Unexpected end of file" << std::endl;
+		return std::optional<std::string>{};
 	};
 
 	while (iter != data.end()) {
@@ -26,16 +66,19 @@ grammar grammar::parse_from_file(const std::string & data) {
 		consume_whitespace();
 
 		// Read initial symbol
-		if (symbol_t temp_sym{*iter}; isupper(*iter)) {
-			nonterm		   = static_cast<int>(to_ret.get_nonterminal(temp_sym));
-			nonterm_symbol = *iter;
+		if (auto symbol = consume_symbol();
+			symbol
+			and (isupper(symbol.value().front())
+				 or symbol.value().front() == '<')) {
+			nonterm_symbol = symbol.value();
+			nonterm		   = to_ret.get_nonterminal(symbol_t{nonterm_symbol});
 			std::cout << "Using token " << nonterm << " for nonterminal "
 					  << nonterm_symbol << std::endl;
-			iter++;
 		} else {
-			std::cerr
-				<< "Cannot use " << *iter
-				<< " as a nonterminal\nNonterminals must be capitalized\n";
+			error() << "Cannot use " << *iter
+					<< " as a nonterminal\nNonterminals must either be "
+					   "capitalized or surrounded with <>\n";
+			return std::optional<grammar>{};
 		}
 
 		// remove whitespace between symbol and hyphen
@@ -48,8 +91,8 @@ grammar grammar::parse_from_file(const std::string & data) {
 			ate_hyphen = true;
 		}
 		if (not ate_hyphen) {
-			std::cerr << "Expected some hyphens after nonterminal "
-					  << nonterm_symbol << '\n';
+			error() << "Expected some hyphens after nonterminal "
+					<< nonterm_symbol << '\n';
 		}
 
 		// remove whitespace
@@ -60,21 +103,26 @@ grammar grammar::parse_from_file(const std::string & data) {
 		// Go to the end of the line
 		// consuming the rest of the line as the rule
 		while (iter != data.end() and *iter != '\n') {
-			if (not isspace(*iter)) {
-				if (*iter == rule_sep_char)
+			if (auto sym = consume_symbol(); sym) {
+				if (auto symbol = sym.value(); symbol == rule_sep_char)
 					rule_list.push_back(rule_sep);
-				else if (symbol_t temp_sym{*iter}; isupper(*iter))
+				else if (symbol_t temp_sym{symbol};
+						 isupper(symbol.front()) or symbol.front() == '<')
 					rule_list.push_back(to_ret.get_nonterminal(temp_sym));
 				else
-					// lower
 					rule_list.push_back(to_ret.get_terminal(temp_sym));
+			} else {
+				error() << "Could not consume next symbol in production for "
+						<< nonterm << std::endl
+						<< "Successfully parsed the following:";
+				std::cerr << std::string{data.begin(), iter} << std::endl;
+				return std::optional<grammar>{};
 			}
-
-			iter++;
 		}
 
 		to_ret.rules.emplace(nonterm, std::move(rule_list));
 		iter++;
+		line_num++;
 	}
 
 	return to_ret;
@@ -215,17 +263,38 @@ bool grammar::using_symbol(symbol_t symbol) const {
 			   [symbol](const auto & entry) { return entry.second == symbol; })
 		   != symbols.end();
 }
+bool grammar::is_nonterminal_symbol(symbol_t symbol) const {
+	if (auto iter = std::find_if(
+			symbols.begin(), symbols.end(),
+			[&symbol](auto & entry) { return entry.second == symbol; });
+		iter != symbols.end())
+		return this->rules.count(iter->first) == 1
+			   and this->using_symbol(symbol);
+	else
+		return false;
+}
+
+bool grammar::is_terminal_symbol(symbol_t symbol) const {
+	if (auto iter = std::find_if(
+			symbols.begin(), symbols.end(),
+			[&symbol](auto & entry) { return entry.second == symbol; });
+		iter != symbols.end())
+		return this->rules.count(iter->first) == 0
+			   and this->using_symbol(symbol);
+	else
+		return false;
+}
 
 std::ostream & operator<<(std::ostream & lhs, const grammar & rhs) {
 	static constexpr auto arrow	 = " --> ";
 	static const auto	  column = std::setw(2);
 
-	lhs << "Symbol mapping (Negative = terminal):\n";
+	lhs << "Symbol mapping (Negative = terminal):" << std::endl;
 	for (const auto & entry : rhs.symbols) {
 		lhs << column << entry.first << arrow << column << entry.second << '\n';
 	}
 
-	lhs << "Rules:\n";
+	lhs << "Rules:" << std::endl;
 	for (const auto & entry : rhs.rules) {
 		lhs << column << entry.first << arrow;
 		for (const auto & symbol : entry.second) {
@@ -234,18 +303,19 @@ std::ostream & operator<<(std::ostream & lhs, const grammar & rhs) {
 			else
 				lhs << column << symbol << ' ';
 		}
-		lhs << '\n';
+		lhs << std::endl;
 	}
 
-	lhs << "Rules Prettified:\n";
+	lhs << "Rules Prettified:" << std::endl;
 	for (const auto & entry : rhs.rules) {
 		lhs << column << rhs.symbols.at(entry.first) << arrow;
-		for (const auto & tok : entry.second)
+		for (const auto & tok : entry.second) {
 			if (tok == grammar::rule_sep)
 				lhs << ' ' << grammar::rule_sep_char << ' ';
 			else
 				lhs << column << rhs.symbols.at(tok) << ' ';
-		lhs << '\n';
+		}
+		lhs << std::endl;
 	}
 
 	return lhs << std::endl;
@@ -270,17 +340,13 @@ token_t grammar::next_terminal() const {
 symbol_t grammar::next_nonterminal_symbol() const {
 	const auto symbols = this->symbol_list();
 
-	std::cout << "List of symbols:";
-	for (auto sym : symbols) std::cout << ' ' << sym;
-	std::cout << std::endl;
-
-	return std::accumulate(
-			   symbols.cbegin(), symbols.cend(), symbol_t{},
-			   [](const auto & to_ret, const auto & sym) {
-				   if (isupper(static_cast<char>(sym)) and to_ret < sym)
-					   return sym;
-				   else
-					   return to_ret;
-			   })
-		   + 1;
+	return std::accumulate(symbols.cbegin(), symbols.cend(), symbol_t{},
+						   [](const auto & to_ret, const auto & sym) {
+							   auto symbol = static_cast<std::string>(sym);
+							   if (isupper(symbol.front()) and to_ret <= sym) {
+								   symbol[0] += 1;
+								   return symbol_t{symbol};
+							   } else
+								   return to_ret;
+						   });
 }

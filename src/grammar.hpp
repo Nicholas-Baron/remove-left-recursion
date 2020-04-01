@@ -3,6 +3,8 @@
 
 #include <ios>
 #include <map>
+#include <optional>
+#include <string>
 #include <vector>
 
 #include "strong_types.hpp"
@@ -25,13 +27,13 @@ class grammar {
 	// A symbol is the printable version
 	// of a nonterminal, terminal, or the rule seperator.
 	// It is exposed as part of the interface for strong typing support.
-	using symbol_t = strong_t<char, symbol_tag>;
+	using symbol_t = strong_t<std::string, symbol_tag>;
 
-	static constexpr token_t  rule_sep{0};
-	static constexpr symbol_t rule_sep_char{'|'};
+	static constexpr token_t rule_sep{0};
+	static inline symbol_t	 rule_sep_char{"|"};
 
-	static grammar empty() { return grammar{}; }
-	static grammar parse_from_file(const std::string & data);
+	static grammar				  empty() { return grammar{}; }
+	static std::optional<grammar> parse_from_file(const std::string & data);
 
 	// Returns each rule as its own vector
 	std::vector<std::vector<token_t>> rule_matrix(token_t nonterminal) const;
@@ -62,15 +64,9 @@ class grammar {
 
 	bool using_symbol(symbol_t symbol) const;
 
-	bool is_nonterminal_symbol(symbol_t symbol) const {
-		return isupper(static_cast<char>(symbol))
-			   and this->using_symbol(symbol);
-	}
+	bool is_nonterminal_symbol(symbol_t symbol) const;
 
-	bool is_terminal_symbol(symbol_t symbol) const {
-		return islower(static_cast<char>(symbol))
-			   and this->using_symbol(symbol);
-	}
+	bool is_terminal_symbol(symbol_t symbol) const;
 
 	std::vector<token_t> nonterminals() const {
 		std::vector<token_t> to_ret{};
@@ -126,7 +122,8 @@ class grammar {
 			}
 
 			return true;
-		} else if (isupper(static_cast<char>(symbol))) {
+		} else if (auto & first_char = static_cast<std::string>(symbol).front();
+				   isupper(first_char) or first_char == '<') {
 			auto nonterm = this->get_nonterminal(symbol);
 			rules.emplace(nonterm, std::move(rule));
 			return true;

@@ -31,9 +31,9 @@ std::optional<grammar> remove_left_recursion(const grammar & input) {
 		return {};
 	}
 
-	auto	   output			  = grammar::empty();
-	const auto input_nonterm_keys = input.nonterminal_keys();
-	auto	   nonterms			  = input.nonterminals();
+	auto			  output			 = grammar::empty();
+	const auto		  input_nonterm_keys = input.nonterminal_keys();
+	const std::vector nonterms			 = input.nonterminals();
 
 	for (const auto entry : input.terminal_keys())
 		if (output.add_terminal(entry.second, entry.first) != entry.first)
@@ -98,7 +98,7 @@ std::optional<grammar> remove_left_recursion(const grammar & input) {
 			if (auto remapped_nonterm_i = output.get_nonterminal(nonterm_i_sym);
 				remapped_nonterm_i != nonterm_i) {
 				std::cout << nonterm_i_sym << " has been remapped to "
-						  << remapped_nonterm_i << '\n';
+						  << remapped_nonterm_i << std::endl;
 				nonterm_i = remapped_nonterm_i;
 			}
 

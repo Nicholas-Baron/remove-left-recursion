@@ -39,7 +39,13 @@ int main(int arg_count, const char ** args) {
 
 	std::cout << "\nGrammar Read From File\n" << data << std::endl;
 
-	auto cfg = grammar::parse_from_file(data);
+	auto cfg = grammar::empty();
+	if (const auto input = grammar::parse_from_file(data); input)
+		cfg = input.value();
+	else {
+		std::cout << "Error occured in parsing" << std::endl;
+		return 1;
+	}
 
 	std::cout << cfg << '\n';
 
@@ -47,7 +53,7 @@ int main(int arg_count, const char ** args) {
 	const auto nonterms = cfg.nonterminals();
 	for (const auto & nonterm : nonterms) {
 		std::cout << std::boolalpha << nonterm << " has epsilon? "
-				  << cfg.has_empty_production(nonterm) << '\n';
+				  << cfg.has_empty_production(nonterm) << std::endl;
 	}
 
 	std::cout << "\nCycle check" << std::endl;
@@ -73,9 +79,12 @@ int main(int arg_count, const char ** args) {
 	auto cleaned = remove_left_recursion(cfg);
 
 	if (cleaned) {
+		std::cout << "Removed all left recursion from the grammar" << std::endl;
 		auto result = cleaned.value();
-		std::cout << result << '\n';
+		std::cout << result << std::endl;
 	} else {
-		std::cout << "Could not clean the grammar.\n";
+		std::cout << "Could not clean the grammar" << std::endl;
 	}
+
+	std::cout << "END OF PROGRAM" << std::endl;
 }

@@ -37,6 +37,10 @@ class strong_t final {
 		return static_cast<rep_t>(lhs) < static_cast<rep_t>(rhs);
 	}
 
+	friend bool operator<=(const this_t & lhs, const this_t & rhs) {
+		return lhs < rhs or lhs == rhs;
+	}
+
 	// LHS is this_t, RHS is rep_t
 
 	friend this_t operator+(const this_t & lhs, const rep_t & rhs) {
