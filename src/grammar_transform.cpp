@@ -56,8 +56,10 @@ std::optional<grammar> remove_left_recursion(const grammar & input) {
 					const auto nonterm_j = nonterms.at(j);
 
 					// Replace A_i -> A_j g with A_i -> d_n g where A_j -> d_n
+					// As there are no epsilon rules, front() can be used with
+					// impunity.
 					if (std::vector<token_t> result_rule;
-						not rule_i.empty() and rule_i.front() == nonterm_j) {
+						rule_i.front() == nonterm_j) {
 						const auto rule_matrix_j
 							= output.rule_matrix(nonterm_j);
 						for (const auto & rule_j : rule_matrix_j) {
@@ -81,9 +83,11 @@ std::optional<grammar> remove_left_recursion(const grammar & input) {
 			if (not removed_recursion) result_matrix.push_back(rule_i);
 		}
 
-		if (result_matrix.empty()) result_matrix = rule_matrix_i;
+		// At this point, the rule matrix is definitly full of rules.
+		// Either a rule had to have left recursion removed
+		// or it was copied wholesale from the input grammar.
 
-		std::cout << "Before recursion removal for nonterm " << nonterm_i
+		std::cout << "Before immediate recursion removal for nonterm " << nonterm_i
 				  << "(sym " << nonterm_i_sym << "):\n";
 		for (auto & row : result_matrix) {
 			for (auto & item : row) std::cout << ' ' << item;
