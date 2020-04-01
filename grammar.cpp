@@ -100,10 +100,9 @@ int grammar::get_nonterminal(char symbol) {
 	if (iter != symbols.end()) {
 		return iter->first;
 	} else {
-		const auto to_ret = next_nonterminal;
+		const auto to_ret = next_nonterminal();
 		symbols[to_ret]	  = symbol;
 		// Rules are added in the parser / manually
-		next_nonterminal++;
 		return to_ret;
 	}
 }
@@ -115,9 +114,8 @@ int grammar::get_terminal(char symbol) {
 	if (iter != symbols.end()) {
 		return iter->first;
 	} else {
-		const auto to_ret = next_terminal;
+		const auto to_ret = next_terminal();
 		symbols[to_ret]	  = symbol;
-		next_terminal--;
 		return to_ret;
 	}
 }
@@ -229,4 +227,27 @@ std::ostream & operator<<(std::ostream & lhs, const grammar & rhs) {
 	}
 
 	return lhs;
+}
+
+int grammar::next_nonterminal() const {
+	return std::max_element(
+			   symbols.begin(), symbols.end(),
+			   [](auto & lhs, auto & rhs) { return lhs.first < rhs.first; })
+			   ->first
+		   + 1;
+}
+
+int grammar::next_terminal() const {
+	return std::min_element(
+			   symbols.begin(), symbols.end(),
+			   [](auto & lhs, auto & rhs) { return lhs.first < rhs.first; })
+			   ->first
+		   - 1;
+}
+char grammar::next_nonterminal_symbol() const {
+	char to_ret = 0;
+	for (auto sym : this->symbol_list())
+		if (isupper(sym)) to_ret = std::max(to_ret, sym);
+
+	return to_ret + 1;
 }
