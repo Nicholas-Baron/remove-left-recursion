@@ -13,25 +13,35 @@ class grammar {
 	// TODO: Write replace_rule
 
    public:
-	static constexpr int  rule_sep		= 0;
-	static constexpr char rule_sep_char = '|';
+	// A token is the internal representation
+	// of a nonterminal, terminal, or the rule seperator.
+	// It is exposed as part of the interface for strong typing support.
+	using token_t = int;
+
+	// A symbol is the printable version
+	// of a nonterminal, terminal, or the rule seperator.
+	// It is exposed as part of the interface for strong typing support.
+	using symbol_t = char;
+
+	static constexpr token_t  rule_sep		= 0;
+	static constexpr symbol_t rule_sep_char = '|';
 
 	static grammar empty() { return grammar{}; }
 	static grammar parse_from_file(const std::string & data);
 
 	// Returns each rule as its own vector
-	std::vector<std::vector<int>> rule_matrix(int nonterminal) const;
+	std::vector<std::vector<token_t>> rule_matrix(int nonterminal) const;
 
 	auto nonterminal_count() const { return rules.size(); }
 	auto terminal_count() const {
 		return symbols.size() - (1 + nonterminal_count());
 	}
 
-	int get_nonterminal(char symbol);
+	token_t get_nonterminal(symbol_t symbol);
 
-	int get_terminal(char symbol);
+	token_t get_terminal(symbol_t symbol);
 
-	bool has_empty_production(int nonterminal) const;
+	bool has_empty_production(token_t nonterminal) const;
 
 	bool has_any_empty_production() const {
 		for (const auto nonterm : this->nonterminals())
@@ -44,36 +54,36 @@ class grammar {
 
 	// Prints one possible cycle path
 	// Empty if could not find one
-	std::vector<int> cyclic_path() const;
+	std::vector<token_t> cyclic_path() const;
 
-	bool using_symbol(char symbol) const;
+	bool using_symbol(symbol_t symbol) const;
 
-	bool is_nonterminal_symbol(char symbol) const {
+	bool is_nonterminal_symbol(symbol_t symbol) const {
 		return isupper(symbol) and this->using_symbol(symbol);
 	}
 
-	bool is_terminal_symbol(char symbol) const {
+	bool is_terminal_symbol(symbol_t symbol) const {
 		return islower(symbol) and this->using_symbol(symbol);
 	}
 
-	std::vector<int> nonterminals() const {
-		std::vector<int> to_ret{};
+	std::vector<token_t> nonterminals() const {
+		std::vector<token_t> to_ret{};
 		for (const auto & entry : symbols) {
 			if (entry.first > 0) { to_ret.push_back(entry.first); }
 		}
 		return to_ret;
 	}
 
-	std::vector<int> terminals() const {
-		std::vector<int> to_ret{};
+	std::vector<token_t> terminals() const {
+		std::vector<token_t> to_ret{};
 		for (const auto & entry : symbols) {
 			if (entry.first < 0) { to_ret.push_back(entry.first); }
 		}
 		return to_ret;
 	}
 
-	std::vector<char> symbol_list() const {
-		std::vector<char> to_ret;
+	std::vector<symbol_t> symbol_list() const {
+		std::vector<symbol_t> to_ret;
 		to_ret.reserve(symbols.size());
 		for (const auto & [_, letter] : symbols) {
 			if (letter != rule_sep_char) to_ret.emplace_back(letter);
@@ -81,25 +91,25 @@ class grammar {
 		return to_ret;
 	}
 
-	std::map<int, char> nonterminal_keys() const {
-		std::map<int, char> to_ret;
-		auto				nonterms = this->nonterminals();
+	std::map<token_t, symbol_t> nonterminal_keys() const {
+		std::map<token_t, symbol_t> to_ret;
+		auto						nonterms = this->nonterminals();
 		for (const auto nonterm : nonterms)
 			to_ret.emplace(nonterm, symbols.at(nonterm));
 
 		return to_ret;
 	}
 
-	std::map<int, char> terminal_keys() const {
-		std::map<int, char> to_ret;
-		auto				terms = this->terminals();
+	std::map<token_t, symbol_t> terminal_keys() const {
+		std::map<token_t, symbol_t> to_ret;
+		auto						terms = this->terminals();
 		for (const auto term : terms) to_ret.emplace(term, symbols.at(term));
 
 		return to_ret;
 	}
 
 	// Returns true if the rule was successfully added
-	bool add_rule(char symbol, std::vector<int> && rule) {
+	bool add_rule(symbol_t symbol, std::vector<token_t> && rule) {
 		if (this->is_nonterminal_symbol(symbol)) {
 			const auto nonterm = get_nonterminal(symbol);
 			if (auto [iter, inserted] = rules.emplace(nonterm, std::move(rule));
@@ -118,7 +128,7 @@ class grammar {
 		return false;
 	}
 
-	int add_terminal(char symbol, int term) {
+	token_t add_terminal(symbol_t symbol, token_t term) {
 		if (symbols.count(term) == 0) {
 			symbols.emplace(term, symbol);
 			return term;
@@ -131,7 +141,7 @@ class grammar {
 		return this->get_terminal(symbol);
 	}
 
-	int add_nonterminal(char symbol, int nonterm) {
+	token_t add_nonterminal(symbol_t symbol, token_t nonterm) {
 		if (symbols.count(nonterm) == 0) {
 			symbols.emplace(nonterm, symbol);
 			return nonterm;
@@ -145,15 +155,15 @@ class grammar {
 	}
 
 	// Helpers to get the next available item
-	int next_nonterminal() const;
+	token_t next_nonterminal() const;
 
-	int next_terminal() const;
+	token_t next_terminal() const;
 
-	char next_nonterminal_symbol() const;
+	symbol_t next_nonterminal_symbol() const;
 
    private:
-	std::map<int, char>				symbols{{rule_sep, rule_sep_char}};
-	std::map<int, std::vector<int>> rules{};
+	std::map<token_t, symbol_t>				symbols{{rule_sep, rule_sep_char}};
+	std::map<token_t, std::vector<token_t>> rules{};
 
 	friend std::ostream & operator<<(std::ostream & lhs, const grammar & rhs);
 };
