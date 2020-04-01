@@ -168,6 +168,7 @@ class grammar {
 	symbol_t next_nonterminal_symbol() const;
 
    private:
+	explicit grammar() = default;
 	std::map<token_t, symbol_t>				symbols{{rule_sep, rule_sep_char}};
 	std::map<token_t, std::vector<token_t>> rules{};
 
