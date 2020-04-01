@@ -1,6 +1,10 @@
 #!/bin/bash
 
-clang-format-9 -i ./*.cpp ./*.hpp
+for file in src/*.{cpp,hpp}; do
+    echo "Formatting $file"
+    clang-format-9 -i "$file"
+done
+clear
 pushd build
 cmake ..
 make -j"$(nproc)"
