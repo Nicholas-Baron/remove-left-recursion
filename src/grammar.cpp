@@ -237,7 +237,18 @@ std::ostream & operator<<(std::ostream & lhs, const grammar & rhs) {
 		lhs << '\n';
 	}
 
-	return lhs;
+	lhs << "Rules Prettified:\n";
+	for (const auto & entry : rhs.rules) {
+		lhs << column << rhs.symbols.at(entry.first) << arrow;
+		for (const auto & tok : entry.second)
+			if (tok == grammar::rule_sep)
+				lhs << ' ' << grammar::rule_sep_char << ' ';
+			else
+				lhs << column << rhs.symbols.at(tok) << ' ';
+		lhs << '\n';
+	}
+
+	return lhs << std::endl;
 }
 
 token_t grammar::next_nonterminal() const {
