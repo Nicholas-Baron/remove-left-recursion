@@ -49,16 +49,17 @@ std::optional<grammar> remove_left_recursion(const grammar & input) {
 		std::vector<std::vector<token_t>> result_matrix{};
 
 		for (const auto & rule_i : rule_matrix_i) {
-			std::vector<token_t> result_rule;
-			bool				 removed_recursion = false;
+			bool removed_recursion = false;
 
 			if (i != 0)
 				for (auto j = 0ul; j < i and not removed_recursion; j++) {
-					auto nonterm_j = nonterms.at(j);
+					const auto nonterm_j = nonterms.at(j);
 
 					// Replace A_i -> A_j g with A_i -> d_n g where A_j -> d_n
-					if (not rule_i.empty() and rule_i.front() == nonterm_j) {
-						auto rule_matrix_j = output.rule_matrix(nonterm_j);
+					if (std::vector<token_t> result_rule;
+						not rule_i.empty() and rule_i.front() == nonterm_j) {
+						const auto rule_matrix_j
+							= output.rule_matrix(nonterm_j);
 						for (const auto & rule_j : rule_matrix_j) {
 							std::copy(rule_j.cbegin(), rule_j.cend(),
 									  std::back_inserter(result_rule));
@@ -77,9 +78,7 @@ std::optional<grammar> remove_left_recursion(const grammar & input) {
 					}
 				}
 
-			if (not removed_recursion)
-				result_matrix.push_back(result_rule.empty() ? rule_i
-															: result_rule);
+			if (not removed_recursion) result_matrix.push_back(rule_i);
 		}
 
 		if (result_matrix.empty()) result_matrix = rule_matrix_i;
