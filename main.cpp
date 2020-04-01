@@ -5,6 +5,7 @@
 #include <string>
 
 #include "grammar.hpp"
+#include "grammar_transform.hpp"
 
 std::string read_file(std::istream & file) {
 	std::stringstream content{};
@@ -68,4 +69,13 @@ int main(int arg_count, const char ** args) {
 	}
 
 	std::cout << std::endl;
+
+	auto cleaned = remove_left_recursion(cfg);
+
+	if (cleaned) {
+		auto result = cleaned.value();
+		std::cout << result << '\n';
+	} else {
+		std::cout << "Could not clean the grammar.\n";
+	}
 }
