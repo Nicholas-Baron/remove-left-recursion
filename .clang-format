@@ -7,7 +7,7 @@ NamespaceIndentation: All
 
 BreakBeforeBraces: Attach
 AllowShortBlocksOnASingleLine: true
-AllowShortFunctionsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: All
 
 BreakConstructorInitializers: BeforeComma
 DerivePointerAlignment: false
