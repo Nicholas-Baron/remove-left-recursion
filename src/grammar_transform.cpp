@@ -14,7 +14,7 @@ std::optional<grammar> remove_left_recursion(const grammar & input) {
         return {};
     }
 
-    if (auto cycle = input.cyclic_path(); cycle.size() > 0) {
+    if (auto cycle = input.cyclic_path(); !cycle.empty()) {
         std::cerr << "Input grammar has a cycle:\n";
         bool first = true;
         for (auto entry : cycle) {
@@ -34,18 +34,18 @@ std::optional<grammar> remove_left_recursion(const grammar & input) {
     const auto        input_nonterm_keys = input.nonterminal_keys();
     const std::vector nonterms           = input.nonterminals();
 
-    for (const auto entry : input.terminal_keys())
+    for (const auto & entry : input.terminal_keys())
         if (output.add_terminal(entry.second, entry.first) != entry.first)
             std::cout << entry.second << " has been remapped\n";
 
-    for (const auto entry : input.nonterminal_keys())
+    for (const auto & entry : input.nonterminal_keys())
         if (output.add_nonterminal(entry.second, entry.first) != entry.first)
             std::cout << entry.second << " has been remapped\n";
 
     for (auto i = 0ul; i < nonterms.size(); i++) {
-        auto       nonterm_i     = nonterms.at(i);
-        const auto rule_matrix_i = input.rule_matrix(nonterm_i);
-        const auto nonterm_i_sym = input_nonterm_keys.at(nonterm_i);
+        auto         nonterm_i     = nonterms.at(i);
+        const auto   rule_matrix_i = input.rule_matrix(nonterm_i);
+        const auto & nonterm_i_sym = input_nonterm_keys.at(nonterm_i);
         std::vector<std::vector<token_t>> result_matrix{};
 
         for (const auto & rule_i : rule_matrix_i) {

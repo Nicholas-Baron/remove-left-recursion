@@ -135,7 +135,8 @@ std::vector<std::vector<token_t>> grammar::rule_matrix(
     if (rules.count(nonterminal) != 0) {
         const auto & all_rules = rules.at(nonterminal);
 
-        to_ret.reserve(std::count(all_rules.begin(), all_rules.end(), 0ul));
+        to_ret.reserve(
+            std::count(all_rules.begin(), all_rules.end(), rule_sep));
 
         for (const auto & symbol : all_rules) {
             if (symbol == rule_sep) {
@@ -149,10 +150,10 @@ std::vector<std::vector<token_t>> grammar::rule_matrix(
     return to_ret;
 }
 
-token_t grammar::get_nonterminal(symbol_t symbol) {
+token_t grammar::get_nonterminal(const symbol_t & symbol) {
     const auto iter = std::find_if(
         symbols.begin(), symbols.end(),
-        [symbol](const auto & item) { return item.second == symbol; });
+        [&symbol](const auto & item) { return item.second == symbol; });
     if (iter != symbols.end()) {
         return iter->first;
     } else {
@@ -163,10 +164,10 @@ token_t grammar::get_nonterminal(symbol_t symbol) {
     }
 }
 
-token_t grammar::get_terminal(symbol_t symbol) {
+token_t grammar::get_terminal(const symbol_t & symbol) {
     const auto iter = std::find_if(
         symbols.begin(), symbols.end(),
-        [symbol](const auto & item) { return item.second == symbol; });
+        [&symbol](const auto & item) { return item.second == symbol; });
 
     if (iter != symbols.end()) {
         return iter->first;
@@ -257,10 +258,10 @@ std::vector<token_t> grammar::cyclic_path() const {
 
     return {};
 }
-bool grammar::using_symbol(symbol_t symbol) const {
+bool grammar::using_symbol(const symbol_t & symbol) const {
     return std::find_if(
                symbols.begin(), symbols.end(),
-               [symbol](const auto & entry) { return entry.second == symbol; })
+               [&symbol](const auto & entry) { return entry.second == symbol; })
            != symbols.end();
 }
 bool grammar::is_nonterminal_symbol(symbol_t symbol) const {

@@ -44,9 +44,9 @@ class grammar {
         return symbols.size() - (1 + nonterminal_count());
     }
 
-    token_t get_nonterminal(symbol_t symbol);
+    token_t get_nonterminal(const symbol_t & symbol);
 
-    token_t get_terminal(symbol_t symbol);
+    token_t get_terminal(const symbol_t & symbol);
 
     [[nodiscard]] bool has_empty_production(token_t nonterminal) const;
 
@@ -65,7 +65,7 @@ class grammar {
     // Empty if could not find one
     [[nodiscard]] std::vector<token_t> cyclic_path() const;
 
-    [[nodiscard]] bool using_symbol(symbol_t symbol) const;
+    [[nodiscard]] bool using_symbol(const symbol_t & symbol) const;
 
     [[nodiscard]] bool is_nonterminal_symbol(symbol_t symbol) const;
 
@@ -125,7 +125,7 @@ class grammar {
             }
 
             return true;
-        } else if (auto & first_char = static_cast<std::string>(symbol).front();
+        } else if (auto first_char = static_cast<std::string>(symbol).front();
                    isupper(first_char) or first_char == '<') {
             auto nonterm = this->get_nonterminal(symbol);
             rules.emplace(nonterm, std::move(rule));
