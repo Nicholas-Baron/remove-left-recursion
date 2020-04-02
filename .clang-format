@@ -1,0 +1,27 @@
+# Documentation: https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+BasedOnStyle: Google
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+NamespaceIndentation: All
+
+BreakBeforeBraces: Attach
+AllowShortBlocksOnASingleLine: true
+AllowShortFunctionsOnASingleLine: true
+
+BreakConstructorInitializers: BeforeComma
+DerivePointerAlignment: false
+PointerAlignment: Middle
+
+BreakBeforeBinaryOperators: All
+
+SpaceAfterTemplateKeyword: false
+SpaceBeforeAssignmentOperators: true
+
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: true
+
+SortUsingDeclarations: true
+SortIncludes: true
+
+AlignTrailingComments: true
