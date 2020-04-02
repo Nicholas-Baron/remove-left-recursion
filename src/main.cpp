@@ -1,5 +1,4 @@
 #include <fstream>
-#include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -43,7 +42,7 @@ int main(int arg_count, const char ** args) {
     if (const auto input = grammar::parse_from_file(data); input)
         cfg = input.value();
     else {
-        std::cout << "Error occured in parsing" << std::endl;
+        std::cout << "Error occurred in parsing" << std::endl;
         return 1;
     }
 

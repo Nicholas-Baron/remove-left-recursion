@@ -20,12 +20,12 @@ class grammar {
 
    public:
     // A token is the internal representation
-    // of a nonterminal, terminal, or the rule seperator.
+    // of a nonterminal, terminal, or the rule separator.
     // It is exposed as part of the interface for strong typing support.
     using token_t = strong_t<int, token_tag>;
 
     // A symbol is the printable version
-    // of a nonterminal, terminal, or the rule seperator.
+    // of a nonterminal, terminal, or the rule separator.
     // It is exposed as part of the interface for strong typing support.
     using symbol_t = strong_t<std::string, symbol_tag>;
 

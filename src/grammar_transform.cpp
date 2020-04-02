@@ -83,7 +83,7 @@ std::optional<grammar> remove_left_recursion(const grammar & input) {
             if (not removed_recursion) result_matrix.push_back(rule_i);
         }
 
-        // At this point, the rule matrix is definitly full of rules.
+        // At this point, the rule matrix is definitely full of rules.
         // Either a rule had to have left recursion removed
         // or it was copied wholesale from the input grammar.
 

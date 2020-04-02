@@ -49,11 +49,11 @@ std::optional<grammar> grammar::parse_from_file(const std::string & data) {
                 // Append the '>'
                 iter++;
                 symbol += '>';
-                return {symbol};
+                return std::optional{symbol};
             } else {
                 auto sym = *iter;
                 iter++;
-                return {std::string(1, sym)};
+                return std::optional{std::string(1, sym)};
             }
         }
 
@@ -135,7 +135,7 @@ std::vector<std::vector<token_t>> grammar::rule_matrix(
     if (rules.count(nonterminal) != 0) {
         const auto & all_rules = rules.at(nonterminal);
 
-        to_ret.reserve(std::count(all_rules.begin(), all_rules.end(), 0));
+        to_ret.reserve(std::count(all_rules.begin(), all_rules.end(), 0ul));
 
         for (const auto & symbol : all_rules) {
             if (symbol == rule_sep) {
@@ -182,7 +182,7 @@ bool grammar::has_empty_production(token_t nonterminal) const {
 
     const auto & rule_list = rules.at(nonterminal);
 
-    // An inital separator = empty production
+    // An initial separator = empty production
     bool last_was_sep = true;
     for (const auto & sym : rule_list) {
         if (sym == rule_sep and last_was_sep)
@@ -340,13 +340,14 @@ token_t grammar::next_terminal() const {
 symbol_t grammar::next_nonterminal_symbol() const {
     const auto symbols = this->symbol_list();
 
-    return std::accumulate(symbols.cbegin(), symbols.cend(), symbol_t{},
-                           [](const auto & to_ret, const auto & sym) {
-                               auto symbol = static_cast<std::string>(sym);
-                               if (isupper(symbol.front()) and to_ret <= sym) {
-                                   symbol[0] += 1;
-                                   return symbol_t{symbol};
-                               } else
-                                   return to_ret;
-                           });
+    return std::accumulate(
+        symbols.cbegin(), symbols.cend(), symbol_t{},
+        [](const auto & to_ret, const auto & sym) -> symbol_t {
+            auto symbol = static_cast<std::string>(sym);
+            if (isupper(symbol.front()) and to_ret <= sym) {
+                symbol[0] += 1;
+                return symbol_t{symbol};
+            } else
+                return to_ret;
+        });
 }
