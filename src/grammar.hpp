@@ -73,95 +73,22 @@ class grammar {
 
     [[nodiscard]] bool is_terminal_symbol(symbol_t symbol) const;
 
-    [[nodiscard]] std::vector<token_t> nonterminals() const {
-        std::vector<token_t> to_ret{};
-        for (const auto & entry : symbols) {
-            if (entry.first > 0) { to_ret.push_back(entry.first); }
-        }
-        return to_ret;
-    }
+    [[nodiscard]] std::vector<token_t> nonterminals() const;
 
-    [[nodiscard]] std::vector<token_t> terminals() const {
-        std::vector<token_t> to_ret{};
-        for (const auto & entry : symbols) {
-            if (entry.first < 0) { to_ret.push_back(entry.first); }
-        }
-        return to_ret;
-    }
+    [[nodiscard]] std::vector<token_t> terminals() const;
 
-    [[nodiscard]] std::vector<symbol_t> symbol_list() const {
-        std::vector<symbol_t> to_ret;
-        to_ret.reserve(symbols.size());
-        for (const auto & [_, letter] : symbols) {
-            if (letter != rule_sep_char()) to_ret.emplace_back(letter);
-        }
-        return to_ret;
-    }
+    [[nodiscard]] std::vector<symbol_t> symbol_list() const;
 
-    [[nodiscard]] std::map<token_t, symbol_t> nonterminal_keys() const {
-        std::map<token_t, symbol_t> to_ret;
-        auto                        nonterms = this->nonterminals();
-        for (const auto nonterm : nonterms)
-            to_ret.emplace(nonterm, symbols.at(nonterm));
+    [[nodiscard]] std::map<token_t, symbol_t> nonterminal_keys() const;
 
-        return to_ret;
-    }
-
-    [[nodiscard]] std::map<token_t, symbol_t> terminal_keys() const {
-        std::map<token_t, symbol_t> to_ret;
-        auto                        terms = this->terminals();
-        for (const auto term : terms) to_ret.emplace(term, symbols.at(term));
-
-        return to_ret;
-    }
+    [[nodiscard]] std::map<token_t, symbol_t> terminal_keys() const;
 
     // Returns true if the rule was successfully added
-    bool add_rule(const symbol_t & symbol, std::vector<token_t> && rule) {
-        if (this->is_nonterminal_symbol(symbol)) {
-            const auto nonterm = get_nonterminal(symbol);
-            if (auto [iter, inserted] = rules.emplace(nonterm, std::move(rule));
-                not inserted) {
-                auto & existing_rule = iter->second;
-                existing_rule.emplace_back(rule_sep);
-                for (const auto & token : existing_rule)
-                    existing_rule.emplace_back(token);
-            }
+    bool add_rule(const symbol_t & symbol, std::vector<token_t> && rule);
 
-            return true;
-        } else if (auto first_char = static_cast<std::string>(symbol).front();
-                   isupper(first_char) or first_char == '<') {
-            auto nonterm = this->get_nonterminal(symbol);
-            rules.emplace(nonterm, std::move(rule));
-            return true;
-        }
-        return false;
-    }
+    token_t add_terminal(const symbol_t & symbol, token_t term);
 
-    token_t add_terminal(const symbol_t & symbol, token_t term) {
-        if (symbols.count(term) == 0) {
-            symbols.emplace(term, symbol);
-            return term;
-        } else if (symbols.at(term) == symbol)
-            return term;
-
-        for (auto & entry : symbols)
-            if (entry.second == symbol) return entry.first;
-
-        return this->get_terminal(symbol);
-    }
-
-    token_t add_nonterminal(const symbol_t & symbol, token_t nonterm) {
-        if (symbols.count(nonterm) == 0) {
-            symbols.emplace(nonterm, symbol);
-            return nonterm;
-        } else if (symbols.at(nonterm) == symbol)
-            return nonterm;
-
-        for (auto & entry : symbols)
-            if (entry.second == symbol) return entry.first;
-
-        return this->get_nonterminal(symbol);
-    }
+    token_t add_nonterminal(const symbol_t & symbol, token_t nonterm);
 
     // Helpers to get the next available item
     [[nodiscard]] token_t next_nonterminal() const;

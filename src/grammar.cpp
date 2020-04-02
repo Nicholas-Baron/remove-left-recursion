@@ -352,3 +352,92 @@ symbol_t grammar::next_nonterminal_symbol() const {
                 return to_ret;
         });
 }
+
+std::vector<token_t> grammar::nonterminals() const {
+    std::vector<token_t> to_ret{};
+    for (const auto & entry : symbols) {
+        if (entry.first > 0) { to_ret.push_back(entry.first); }
+    }
+    return to_ret;
+}
+
+std::vector<token_t> grammar::terminals() const {
+    std::vector<token_t> to_ret{};
+    for (const auto & entry : symbols) {
+        if (entry.first < 0) { to_ret.push_back(entry.first); }
+    }
+    return to_ret;
+}
+
+std::vector<symbol_t> grammar::symbol_list() const {
+    std::vector<symbol_t> to_ret;
+    to_ret.reserve(symbols.size());
+    for (const auto & [_, letter] : symbols) {
+        if (letter != rule_sep_char()) to_ret.emplace_back(letter);
+    }
+    return to_ret;
+}
+
+std::map<token_t, symbol_t> grammar::nonterminal_keys() const {
+    std::map<token_t, symbol_t> to_ret;
+    auto                        nonterms = this->nonterminals();
+    for (const auto nonterm : nonterms)
+        to_ret.emplace(nonterm, symbols.at(nonterm));
+
+    return to_ret;
+}
+
+std::map<token_t, symbol_t> grammar::terminal_keys() const {
+    std::map<token_t, symbol_t> to_ret;
+    auto                        terms = this->terminals();
+    for (const auto term : terms) to_ret.emplace(term, symbols.at(term));
+
+    return to_ret;
+}
+
+bool grammar::add_rule(const symbol_t & symbol, std::vector<token_t> && rule) {
+    if (this->is_nonterminal_symbol(symbol)) {
+        const auto nonterm = get_nonterminal(symbol);
+        if (auto [iter, inserted] = rules.emplace(nonterm, std::move(rule));
+            not inserted) {
+            auto & existing_rule = iter->second;
+            existing_rule.emplace_back(rule_sep);
+            for (const auto & token : existing_rule)
+                existing_rule.emplace_back(token);
+        }
+
+        return true;
+    } else if (auto first_char = static_cast<std::string>(symbol).front();
+               isupper(first_char) or first_char == '<') {
+        auto nonterm = this->get_nonterminal(symbol);
+        rules.emplace(nonterm, std::move(rule));
+        return true;
+    }
+    return false;
+}
+
+token_t grammar::add_terminal(const symbol_t & symbol, token_t term) {
+    if (symbols.count(term) == 0) {
+        symbols.emplace(term, symbol);
+        return term;
+    } else if (symbols.at(term) == symbol)
+        return term;
+
+    for (auto & entry : symbols)
+        if (entry.second == symbol) return entry.first;
+
+    return this->get_terminal(symbol);
+}
+
+token_t grammar::add_nonterminal(const symbol_t & symbol, token_t nonterm) {
+    if (symbols.count(nonterm) == 0) {
+        symbols.emplace(nonterm, symbol);
+        return nonterm;
+    } else if (symbols.at(nonterm) == symbol)
+        return nonterm;
+
+    for (auto & entry : symbols)
+        if (entry.second == symbol) return entry.first;
+
+    return this->get_nonterminal(symbol);
+}
