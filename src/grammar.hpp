@@ -29,8 +29,10 @@ class grammar {
     // It is exposed as part of the interface for strong typing support.
     using symbol_t = strong_t<std::string, symbol_tag>;
 
-    static constexpr token_t rule_sep{0};
-    static inline symbol_t   rule_sep_char{"|"};
+    static constexpr token_t             rule_sep{0};
+    [[nodiscard]] static inline symbol_t rule_sep_char() {
+        return symbol_t{"|"};
+    };
 
     static grammar                empty() { return grammar{}; }
     static std::optional<grammar> parse_from_file(const std::string & data);
@@ -91,7 +93,7 @@ class grammar {
         std::vector<symbol_t> to_ret;
         to_ret.reserve(symbols.size());
         for (const auto & [_, letter] : symbols) {
-            if (letter != rule_sep_char) to_ret.emplace_back(letter);
+            if (letter != rule_sep_char()) to_ret.emplace_back(letter);
         }
         return to_ret;
     }
@@ -169,7 +171,7 @@ class grammar {
 
    private:
     explicit grammar() = default;
-    std::map<token_t, symbol_t>             symbols{{rule_sep, rule_sep_char}};
+    std::map<token_t, symbol_t> symbols{{rule_sep, rule_sep_char()}};
     std::map<token_t, std::vector<token_t>> rules{};
 
     friend std::ostream & operator<<(std::ostream & lhs, const grammar & rhs);

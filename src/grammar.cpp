@@ -104,7 +104,7 @@ std::optional<grammar> grammar::parse_from_file(const std::string & data) {
         // consuming the rest of the line as the rule
         while (iter != data.end() and *iter != '\n') {
             if (auto sym = consume_symbol(); sym) {
-                if (auto symbol = sym.value(); symbol == rule_sep_char)
+                if (auto symbol = sym.value(); symbol == rule_sep_char())
                     rule_list.push_back(rule_sep);
                 else if (symbol_t temp_sym{symbol};
                          isupper(symbol.front()) or symbol.front() == '<')
@@ -114,8 +114,8 @@ std::optional<grammar> grammar::parse_from_file(const std::string & data) {
             } else {
                 error() << "Could not consume next symbol in production for "
                         << nonterm << std::endl
-                        << "Successfully parsed the following:";
-                std::cerr << std::string{data.begin(), iter} << std::endl;
+                        << "Successfully parsed the following:"
+                        << std::string{data.begin(), iter} << std::endl;
                 return std::optional<grammar>{};
             }
         }
@@ -300,7 +300,7 @@ std::ostream & operator<<(std::ostream & lhs, const grammar & rhs) {
         lhs << column << entry.first << arrow;
         for (const auto & symbol : entry.second) {
             if (symbol == grammar::rule_sep)
-                lhs << ' ' << grammar::rule_sep_char << ' ';
+                lhs << ' ' << grammar::rule_sep_char() << ' ';
             else
                 lhs << column << symbol << ' ';
         }
@@ -312,7 +312,7 @@ std::ostream & operator<<(std::ostream & lhs, const grammar & rhs) {
         lhs << column << rhs.symbols.at(entry.first) << arrow;
         for (const auto & tok : entry.second) {
             if (tok == grammar::rule_sep)
-                lhs << ' ' << grammar::rule_sep_char << ' ';
+                lhs << ' ' << grammar::rule_sep_char() << ' ';
             else
                 lhs << column << rhs.symbols.at(tok) << ' ';
         }
