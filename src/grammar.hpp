@@ -36,10 +36,10 @@ class grammar {
 	static std::optional<grammar> parse_from_file(const std::string & data);
 
 	// Returns each rule as its own vector
-	std::vector<std::vector<token_t>> rule_matrix(token_t nonterminal) const;
+	[[nodiscard]] std::vector<std::vector<token_t>> rule_matrix(token_t nonterminal) const;
 
-	auto nonterminal_count() const { return rules.size(); }
-	auto terminal_count() const {
+	[[nodiscard]] auto nonterminal_count() const { return rules.size(); }
+	[[nodiscard]] auto terminal_count() const {
 		return symbols.size() - (1 + nonterminal_count());
 	}
 
@@ -47,28 +47,28 @@ class grammar {
 
 	token_t get_terminal(symbol_t symbol);
 
-	bool has_empty_production(token_t nonterminal) const;
+	[[nodiscard]] bool has_empty_production(token_t nonterminal) const;
 
-	bool has_any_empty_production() const {
+	[[nodiscard]] bool has_any_empty_production() const {
 		for (const auto nonterm : this->nonterminals())
 			if (this->has_empty_production(nonterm)) return true;
 
 		return false;
 	}
 
-	bool has_any_cycle() const { return this->cyclic_path().size() > 0; }
+	[[nodiscard]] bool has_any_cycle() const { return !this->cyclic_path().empty(); }
 
 	// Prints one possible cycle path
 	// Empty if could not find one
-	std::vector<token_t> cyclic_path() const;
+	[[nodiscard]] std::vector<token_t> cyclic_path() const;
 
-	bool using_symbol(symbol_t symbol) const;
+	[[nodiscard]] bool using_symbol(symbol_t symbol) const;
 
-	bool is_nonterminal_symbol(symbol_t symbol) const;
+	[[nodiscard]] bool is_nonterminal_symbol(symbol_t symbol) const;
 
-	bool is_terminal_symbol(symbol_t symbol) const;
+	[[nodiscard]] bool is_terminal_symbol(symbol_t symbol) const;
 
-	std::vector<token_t> nonterminals() const {
+	[[nodiscard]] std::vector<token_t> nonterminals() const {
 		std::vector<token_t> to_ret{};
 		for (const auto & entry : symbols) {
 			if (entry.first > 0) { to_ret.push_back(entry.first); }
@@ -76,7 +76,7 @@ class grammar {
 		return to_ret;
 	}
 
-	std::vector<token_t> terminals() const {
+	[[nodiscard]] std::vector<token_t> terminals() const {
 		std::vector<token_t> to_ret{};
 		for (const auto & entry : symbols) {
 			if (entry.first < 0) { to_ret.push_back(entry.first); }
@@ -84,7 +84,7 @@ class grammar {
 		return to_ret;
 	}
 
-	std::vector<symbol_t> symbol_list() const {
+	[[nodiscard]] std::vector<symbol_t> symbol_list() const {
 		std::vector<symbol_t> to_ret;
 		to_ret.reserve(symbols.size());
 		for (const auto & [_, letter] : symbols) {
@@ -93,7 +93,7 @@ class grammar {
 		return to_ret;
 	}
 
-	std::map<token_t, symbol_t> nonterminal_keys() const {
+	[[nodiscard]] std::map<token_t, symbol_t> nonterminal_keys() const {
 		std::map<token_t, symbol_t> to_ret;
 		auto						nonterms = this->nonterminals();
 		for (const auto nonterm : nonterms)
@@ -102,7 +102,7 @@ class grammar {
 		return to_ret;
 	}
 
-	std::map<token_t, symbol_t> terminal_keys() const {
+	[[nodiscard]] std::map<token_t, symbol_t> terminal_keys() const {
 		std::map<token_t, symbol_t> to_ret;
 		auto						terms = this->terminals();
 		for (const auto term : terms) to_ret.emplace(term, symbols.at(term));
@@ -158,11 +158,11 @@ class grammar {
 	}
 
 	// Helpers to get the next available item
-	token_t next_nonterminal() const;
+	[[nodiscard]] token_t next_nonterminal() const;
 
-	token_t next_terminal() const;
+	[[nodiscard]] token_t next_terminal() const;
 
-	symbol_t next_nonterminal_symbol() const;
+	[[nodiscard]] symbol_t next_nonterminal_symbol() const;
 
    private:
 	explicit grammar() = default;
