@@ -14,10 +14,10 @@ std::optional<grammar> remove_left_recursion(const grammar & input) {
         return {};
     }
 
-    if (auto cycle = input.cyclic_path(); !cycle.empty()) {
+    if (const auto cycle = input.cyclic_path(); !cycle.empty()) {
         std::cerr << "Input grammar has a cycle:\n";
         bool first = true;
-        for (auto entry : cycle) {
+        for (const auto & entry : cycle) {
             if (first) {
                 first = false;
             } else {

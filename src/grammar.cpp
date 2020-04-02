@@ -339,10 +339,10 @@ token_t grammar::next_terminal() const {
 }
 
 symbol_t grammar::next_nonterminal_symbol() const {
-    const auto symbols = this->symbol_list();
+    const auto symbol_list = this->symbol_list();
 
     return std::accumulate(
-        symbols.cbegin(), symbols.cend(), symbol_t{},
+        symbol_list.cbegin(), symbol_list.cend(), symbol_t{},
         [](const auto & to_ret, const auto & sym) -> symbol_t {
             auto symbol = static_cast<std::string>(sym);
             if (isupper(symbol.front()) and to_ret <= sym) {

@@ -116,14 +116,15 @@ class grammar {
     }
 
     // Returns true if the rule was successfully added
-    bool add_rule(symbol_t symbol, std::vector<token_t> && rule) {
+    bool add_rule(const symbol_t & symbol, std::vector<token_t> && rule) {
         if (this->is_nonterminal_symbol(symbol)) {
             const auto nonterm = get_nonterminal(symbol);
             if (auto [iter, inserted] = rules.emplace(nonterm, std::move(rule));
                 not inserted) {
-                auto & rule = iter->second;
-                rule.emplace_back(rule_sep);
-                for (const auto & token : rule) rule.emplace_back(token);
+                auto & existing_rule = iter->second;
+                existing_rule.emplace_back(rule_sep);
+                for (const auto & token : existing_rule)
+                    existing_rule.emplace_back(token);
             }
 
             return true;
@@ -136,7 +137,7 @@ class grammar {
         return false;
     }
 
-    token_t add_terminal(symbol_t symbol, token_t term) {
+    token_t add_terminal(const symbol_t & symbol, token_t term) {
         if (symbols.count(term) == 0) {
             symbols.emplace(term, symbol);
             return term;
@@ -149,7 +150,7 @@ class grammar {
         return this->get_terminal(symbol);
     }
 
-    token_t add_nonterminal(symbol_t symbol, token_t nonterm) {
+    token_t add_nonterminal(const symbol_t & symbol, token_t nonterm) {
         if (symbols.count(nonterm) == 0) {
             symbols.emplace(nonterm, symbol);
             return nonterm;
