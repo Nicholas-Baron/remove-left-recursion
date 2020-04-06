@@ -14,6 +14,8 @@
 // negative numbers.
 class grammar {
     // TODO: Write replace_rule
+    // TODO: Sort the member functions both in the header and cpp
+    // TODO: Convert to the rule_t = std::vector<token_t>
 
     struct token_tag {};
     struct symbol_tag {};
