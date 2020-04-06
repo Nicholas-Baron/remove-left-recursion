@@ -42,7 +42,15 @@ std::string read_cfg_data(int arg_count, const char ** args) {
 int main(int arg_count, const char ** args) {
     const auto data = read_cfg_data(arg_count, args);
 
-    if(data.empty()) return 0;
+    if (data.empty()) {
+        std::cout << args[0] << '\n'
+                  << "Usage:\n\tno args -> filename in stdin\n\t-h or --help "
+                     "-> this help message\n"
+                  << "\t- or -- -> grammar in stdin\n\t<filename> -> file read "
+                     "as grammar"
+                  << std::endl;
+        return 0;
+    }
 
     auto cfg = grammar::empty();
     if (const auto input = grammar::parse_from_file(data); input)
