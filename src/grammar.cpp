@@ -61,7 +61,7 @@ std::optional<grammar> grammar::parse_from_file(const std::string & data) {
         return std::optional<std::string>{};
     };
 
-    while (iter != data.end()) {
+    while (iter < data.end()) {
         // Remove initial whitespace
         consume_whitespace();
 
