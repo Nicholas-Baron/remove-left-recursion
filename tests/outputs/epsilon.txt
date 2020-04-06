@@ -1,0 +1,41 @@
+Using token 1 for nonterminal A
+Symbol mapping (Negative = terminal):
+-2 -->  
+
+-1 -->  a
+ 0 -->  |
+ 1 -->  A
+Rules:
+ 1 -->  1 -1  | -2 
+Rules Prettified:
+ A -->  A  a  |  
+ 
+
+
+Epsilon check
+1 has epsilon? false
+
+Cycle check
+Could not find cycle
+
+Before immediate recursion removal for nonterm 1(sym A):
+ 1 -1
+ -2
+Removed all left recursion from the grammar
+Symbol mapping (Negative = terminal):
+-2 -->  
+
+-1 -->  a
+ 0 -->  |
+ 1 -->  A
+ 2 -->  B
+Rules:
+ 1 --> -2  2 
+ 2 -->  | -1  2 
+Rules Prettified:
+ A -->  
+  B 
+ B -->  |  a  B 
+
+
+END OF PROGRAM
