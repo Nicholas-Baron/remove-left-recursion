@@ -22,16 +22,16 @@ std::string read_cfg_data(int arg_count, const char ** args) {
         while (args[arg_num] != nullptr) {
             if (arg_num == arg_count - 1) { filename = args[arg_num]; }
             arg_num++;
-            if(filename == "-h" or filename == "--help") return "";
+            if (filename == "-h" or filename == "--help") return "";
         }
     }
 
-    if(filename.empty()){
+    if (filename.empty()) {
         std::cout << "Enter a file that contains a grammar: ";
         std::cin >> filename;
         std::ifstream file{filename};
         return read_file(file);
-    }else if (filename == "-" or filename == "--") {
+    } else if (filename == "-" or filename == "--") {
         return read_file(std::cin);
     } else {
         std::ifstream file{filename};
