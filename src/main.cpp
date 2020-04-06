@@ -22,10 +22,16 @@ std::string read_cfg_data(int arg_count, const char ** args) {
         while (args[arg_num] != nullptr) {
             if (arg_num == arg_count - 1) { filename = args[arg_num]; }
             arg_num++;
+            if(filename == "-h" or filename == "--help") return "";
         }
     }
 
-    if (filename.empty() or filename == "-" or filename == "--") {
+    if(filename.empty()){
+        std::cout << "Enter a file that contains a grammar: ";
+        std::cin >> filename;
+        std::ifstream file{filename};
+        return read_file(file);
+    }else if (filename == "-" or filename == "--") {
         return read_file(std::cin);
     } else {
         std::ifstream file{filename};
@@ -36,7 +42,7 @@ std::string read_cfg_data(int arg_count, const char ** args) {
 int main(int arg_count, const char ** args) {
     const auto data = read_cfg_data(arg_count, args);
 
-    std::cout << "\nGrammar Read From File\n" << data << std::endl;
+    if(data.empty()) return 0;
 
     auto cfg = grammar::empty();
     if (const auto input = grammar::parse_from_file(data); input)
