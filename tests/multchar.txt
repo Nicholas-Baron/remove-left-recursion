@@ -1,2 +1,2 @@
-A - <Beta>b | c
-<Beta> - A|e
+A - <Beta>b | c;
+<Beta> - A|e;

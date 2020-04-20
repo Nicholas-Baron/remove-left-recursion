@@ -1,4 +1,4 @@
-A - Aa | B
-B - C | Aa
-C - D | cB
-D - A | bb
+A - Aa | B ;
+B - C | Aa ;
+C - D | cB ;
+D - A | bb ;

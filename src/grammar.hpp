@@ -1,6 +1,7 @@
 #ifndef GRAMMAR_HPP
 #define GRAMMAR_HPP
 
+#include <algorithm>
 #include <ios>
 #include <map>
 #include <optional>
@@ -61,8 +62,17 @@ class grammar {
         return false;
     }
 
+	[[nodiscard]] bool in_some_production(const token_t & tok) const {
+		for(const auto & entry : rules)
+			if(std::any_of(entry.second.begin(), entry.second.end(),
+						[&tok](const auto & token){ return tok == token; }))
+				return true;
+
+		return false;
+	}
+
     [[nodiscard]] bool has_any_cycle() const {
-        return !this->cyclic_path().empty();
+        return not this->cyclic_path().empty();
     }
 
     // Prints one possible cycle path

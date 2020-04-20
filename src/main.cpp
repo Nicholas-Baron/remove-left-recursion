@@ -87,6 +87,9 @@ int main(int arg_count, const char ** args) {
         std::cout << "Could not find cycle\n";
     }
 
+	std::cout << "Making cfg proper\n";
+	auto proper = remove_epsilon(cfg);
+
     std::cout << std::endl;
 
     auto cleaned = remove_left_recursion(cfg);

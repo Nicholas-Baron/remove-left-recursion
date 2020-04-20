@@ -19,7 +19,7 @@ std::optional<grammar> grammar::parse_from_file(const std::string & data) {
     size_t      line_num = 1;
 
     const auto consume_whitespace = [&iter, &data] {
-        while (iter != data.end() and isspace(*iter) and *iter != '\n') iter++;
+        while (iter != data.end() and isspace(*iter)) iter++;
     };
 
     const auto error = [&line_num]() -> std::ostream & {
@@ -38,8 +38,9 @@ std::optional<grammar> grammar::parse_from_file(const std::string & data) {
                     ++iter;
 
                     if (*iter == '<' or *iter == ';'
-                        or *iter == grammar::rule_sep) {
-                        std::cerr << "Cannot use ';', '<', or '|' in a symbol "
+                        or *iter == grammar::rule_sep
+						or *iter == '\n') {
+                        std::cerr << "Cannot use ';', '<', '|', or newline in a symbol "
                                      "name\nOffending name:"
                                   << symbol << std::endl;
                         return std::optional<std::string>{};
@@ -64,6 +65,7 @@ std::optional<grammar> grammar::parse_from_file(const std::string & data) {
     while (iter < data.end()) {
         // Remove initial whitespace
         consume_whitespace();
+		if(iter >= data.end()) break;
 
         // Read initial symbol
         if (auto symbol = consume_symbol();
@@ -92,7 +94,7 @@ std::optional<grammar> grammar::parse_from_file(const std::string & data) {
         }
         if (not ate_hyphen) {
             error() << "Expected some hyphens after nonterminal "
-                    << nonterm_symbol << '\n';
+                    << nonterm_symbol << std::endl;
         }
 
         // remove whitespace
@@ -102,7 +104,7 @@ std::optional<grammar> grammar::parse_from_file(const std::string & data) {
 
         // Go to the end of the line
         // consuming the rest of the line as the rule
-        while (iter != data.end() and *iter != '\n') {
+        while (iter < data.end() and *iter != ';') {
             if (auto sym = consume_symbol(); sym) {
                 if (auto symbol = sym.value(); symbol == rule_sep_char())
                     rule_list.push_back(rule_sep);
@@ -118,6 +120,7 @@ std::optional<grammar> grammar::parse_from_file(const std::string & data) {
                         << std::string{data.begin(), iter} << std::endl;
                 return std::optional<grammar>{};
             }
+			consume_whitespace();
         }
 
         to_ret.rules.emplace(nonterm, std::move(rule_list));
@@ -125,6 +128,7 @@ std::optional<grammar> grammar::parse_from_file(const std::string & data) {
         line_num++;
     }
 
+	std::cout << "Successfully parsed grammar\n";
     return to_ret;
 }
 
