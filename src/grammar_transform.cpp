@@ -7,6 +7,12 @@
 
 using token_t = grammar::token_t;
 
+// A template to help with checking if a container contains an item
+template<typename T, typename Iter>
+bool contains(Iter begin, Iter end, T item) {
+    return std::find(begin, end, item) != end;
+}
+
 std::optional<grammar> remove_left_recursion(const grammar & input) {
     // Preconditions: input has no empty productions and no cycles
 
@@ -164,9 +170,7 @@ std::optional<grammar> remove_left_recursion(const grammar & input) {
     return std::optional{output};
 }
 
-/*
-grammar make_proper_form(const grammar & input){
-
+grammar make_proper_form(const grammar & input) {
     // remove epsilon
 
     // remove cycles
@@ -175,9 +179,7 @@ grammar make_proper_form(const grammar & input){
 
     // remove unreachable symbols
     return remove_unreachables(remove_unit_productions(remove_epsilon(input)));
-
 }
-*/
 
 grammar remove_epsilon(const grammar & input) {
     if (not input.has_any_empty_production()) return input;
@@ -276,9 +278,8 @@ grammar remove_unit_productions(grammar input) {
                  ++iter) {
                 auto dest_nonterm = iter->front();
                 if (iter->size() == 1
-                    and std::find(nonterms.begin(), nonterms.end(),
-                                  dest_nonterm)
-                            != nonterms.end()) {
+                    and contains(nonterms.begin(), nonterms.end(),
+                                 dest_nonterm)) {
                     auto last_iter = iter - 1;
                     rule_matrix.erase(iter);
                     iter = last_iter;
@@ -302,8 +303,7 @@ grammar remove_unit_productions(grammar input) {
             }
 
             for (const auto & rule : new_rules) {
-                if (std::find(rule_matrix.begin(), rule_matrix.end(), rule)
-                        == rule_matrix.end()
+                if (not contains(rule_matrix.begin(), rule_matrix.end(), rule)
                     and not(rule.size() == 1 and rule.front() == nonterm)) {
                     // If the rule was not already added
                     // and it is not a rule of the form "A -> A"
@@ -321,4 +321,48 @@ grammar remove_unit_productions(grammar input) {
     }
 
     return input;
+}
+
+grammar remove_unreachables(const grammar & input) {
+    auto              output             = grammar::empty();
+    const auto        input_nonterm_keys = input.nonterminal_keys();
+    const std::vector nonterms           = input.nonterminals();
+
+    // Copy over the terminals
+    for (const auto & term : input.terminal_keys())
+        if (output.add_terminal(term.second, term.first) != term.first)
+            std::cout << term.second << " was remapped!\n";
+
+    // Save all reachable nonterminals
+    std::vector reachable{nonterms.front()};
+    for (size_t reachable_count = 0; reachable_count < reachable.size();
+         ++reachable_count) {
+        for (const auto & rule :
+             input.rule_matrix(reachable.at(reachable_count))) {
+            for (auto token : rule) {
+                // If a token is reachable, a nonterminal, and is not already
+                // reachable, add it to the list of reachables
+                if (contains(nonterms.begin(), nonterms.end(), token)
+                    and not contains(reachable.begin(), reachable.end(), token)) {
+                    reachable.push_back(token);
+                }
+            }
+        }
+    }
+
+    for (auto nonterm : reachable) {
+        std::vector<token_t> final_rule{};
+        bool                 first = true;
+        for (const auto & rule : input.rule_matrix(nonterm)) {
+            if (first)
+                first = false;
+            else
+                final_rule.push_back(grammar::rule_sep);
+
+            for (const auto & tok : rule) final_rule.push_back(tok);
+        }
+        output.add_rule(input_nonterm_keys.at(nonterm), std::move(final_rule));
+    }
+
+    return output;
 }

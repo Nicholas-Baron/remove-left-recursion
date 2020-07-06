@@ -88,7 +88,7 @@ int main(int arg_count, const char ** args) {
     }
 
     std::cout << "Making cfg proper\n";
-    auto proper = remove_unit_productions(remove_epsilon(cfg));
+    auto proper = make_proper_form(cfg);
 
     std::cout << proper << std::endl;
 
