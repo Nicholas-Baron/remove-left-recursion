@@ -167,92 +167,158 @@ std::optional<grammar> remove_left_recursion(const grammar & input) {
 /*
 grammar make_proper_form(const grammar & input){
 
-	// remove epsilon
+    // remove epsilon
 
-	// remove cycles
+    // remove cycles
 
-	// remove unproductive symbols
-	
-	// remove unreachable symbols
-	return remove_unreachables(remove_cycles(remove_epsilon(input)));
+    // remove unproductive symbols
+
+    // remove unreachable symbols
+    return remove_unreachables(remove_unit_productions(remove_epsilon(input)));
 
 }
 */
 
-grammar remove_epsilon(const grammar & input){
-	if(not input.has_any_empty_production()) return input;
+grammar remove_epsilon(const grammar & input) {
+    if (not input.has_any_empty_production()) return input;
 
     auto              output             = grammar::empty();
     const auto        input_nonterm_keys = input.nonterminal_keys();
     const std::vector nonterms           = input.nonterminals();
-	
-	// Copy over the terminals
-	for(const auto & term : input.terminal_keys())
-		if(output.add_terminal(term.second, term.first) != term.first)
-			std::cout << term.second << " was remapped!\n";
 
-	// If the first symbol has epsilon, check if it is used anywhere
-	if(input.has_empty_production(nonterms.front())){
-		if(input.in_some_production(nonterms.front())){
-			// Since the initial symbol is used somewhere in the grammar
-			// and it can generate empty,
-			// the grammmar must be augmented.
-			
-			// This is done in the form B -> A | empty ; A -> a_1 | a_2
-			// where the original rule was A -> empty | a_1 | a_2
+    // Copy over the terminals
+    for (const auto & term : input.terminal_keys())
+        if (output.add_terminal(term.second, term.first) != term.first)
+            std::cout << term.second << " was remapped!\n";
 
-			auto initial_sym = input_nonterm_keys.at(nonterms.front());
+    // If the first symbol has epsilon, check if it is used anywhere
+    if (input.has_empty_production(nonterms.front())) {
+        if (input.in_some_production(nonterms.front())) {
+            // Since the initial symbol is used somewhere in the grammar
+            // and it can generate empty,
+            // the grammmar must be augmented.
 
-			auto initial = output.add_nonterminal(initial_sym, nonterms.front());
+            // This is done in the form B -> A | empty ; A -> a_1 | a_2
+            // where the original rule was A -> empty | a_1 | a_2
 
-			// The new symbol added from the augmentation
-			auto true_initial_sym = output.next_nonterminal_symbol();
-			output.add_nonterminal(
-					true_initial_sym, output.next_nonterminal());
+            auto initial_sym = input_nonterm_keys.at(nonterms.front());
 
-			output.add_rule(true_initial_sym, std::vector<token_t>{initial, grammar::rule_sep});
+            auto initial
+                = output.add_nonterminal(initial_sym, nonterms.front());
 
-			std::cout << "Grammar has been augmented\n";
-		}
-	}
+            // The new symbol added from the augmentation
+            auto true_initial_sym = output.next_nonterminal_symbol();
+            output.add_nonterminal(true_initial_sym, output.next_nonterminal());
 
-	// For every rule with a nonterminal that can be epsilon in it,
-	// that rule is duplicated and the copy has the nonterminal removed
-	std::set<token_t> to_remove;
-	for(const auto & nonterm : nonterms)
-		if(input.has_empty_production(nonterm))
-			to_remove.emplace(nonterm);
+            output.add_rule(true_initial_sym,
+                            std::vector<token_t>{initial, grammar::rule_sep});
 
-	for(const auto & nonterm : nonterms){
-		auto rule_matrix = input.rule_matrix(nonterm);
-		rule_matrix.reserve(rule_matrix.size() + to_remove.size());
+            std::cout << "Grammar has been augmented\n";
+        }
+    }
 
-		for(auto & rule : rule_matrix)
-			for(const auto & removing : to_remove)
-				if(const auto loc = std::find(rule.begin(), rule.end(), removing);
-						loc != rule.end()){
-					rule_matrix.emplace_back(rule);
-					rule.erase(loc);
-				}
+    // For every rule with a nonterminal that can be epsilon in it,
+    // that rule is duplicated and the copy has the nonterminal removed
+    std::set<token_t> to_remove;
+    for (const auto & nonterm : nonterms)
+        if (input.has_empty_production(nonterm)) to_remove.emplace(nonterm);
 
-		std::vector<token_t> final_rule{};
-		bool first = true;
-		for (const auto & rule : rule_matrix){
-			if(rule.empty()) continue;
+    for (const auto & nonterm : nonterms) {
+        auto rule_matrix = input.rule_matrix(nonterm);
+        rule_matrix.reserve(rule_matrix.size() + to_remove.size());
 
-			if(first) first = false;
-			else final_rule.push_back(grammar::rule_sep);
+        for (auto & rule : rule_matrix)
+            for (const auto & removing : to_remove)
+                if (const auto loc
+                    = std::find(rule.begin(), rule.end(), removing);
+                    loc != rule.end()) {
+                    rule_matrix.emplace_back(rule);
+                    rule.erase(loc);
+                }
 
-			for(const auto & tok : rule)
-				final_rule.push_back(tok);
-		}
+        std::vector<token_t> final_rule{};
+        bool                 first = true;
+        for (const auto & rule : rule_matrix) {
+            if (rule.empty()) continue;
 
-		output.add_rule(input_nonterm_keys.at(nonterm), std::move(final_rule));
-	}
+            if (first)
+                first = false;
+            else
+                final_rule.push_back(grammar::rule_sep);
 
+            for (const auto & tok : rule) final_rule.push_back(tok);
+        }
 
-	std::cout << "Result:\n";
-	std::cout << output << std::endl;
-	return output;
+        output.add_rule(input_nonterm_keys.at(nonterm), std::move(final_rule));
+    }
+
+    std::cout << "Result:\n";
+    std::cout << output << std::endl;
+    return output;
 }
 
+grammar remove_unit_productions(grammar input) {
+    while (input.has_any_cycle()) {
+        auto              output             = grammar::empty();
+        const auto        input_nonterm_keys = input.nonterminal_keys();
+        const std::vector nonterms           = input.nonterminals();
+
+        // Copy over the terminals
+        for (const auto & term : input.terminal_keys())
+            if (output.add_terminal(term.second, term.first) != term.first)
+                std::cout << term.second << " was remapped!\n";
+
+        for (const auto & nonterm : nonterms) {
+            auto rule_matrix = input.rule_matrix(nonterm);
+            auto new_rules   = decltype(rule_matrix){};
+
+            for (auto iter = rule_matrix.begin(); iter != rule_matrix.end();
+                 ++iter) {
+                auto dest_nonterm = iter->front();
+                if (iter->size() == 1
+                    and std::find(nonterms.begin(), nonterms.end(),
+                                  dest_nonterm)
+                            != nonterms.end()) {
+                    auto last_iter = iter - 1;
+                    rule_matrix.erase(iter);
+                    iter = last_iter;
+                    for (const auto & dest_rule :
+                         input.rule_matrix(dest_nonterm))
+                        new_rules.emplace_back(dest_rule);
+                }
+            }
+
+            std::vector<token_t> final_rule{};
+            bool                 first = true;
+            for (const auto & rule : rule_matrix) {
+                if (rule.empty()) continue;
+
+                if (first)
+                    first = false;
+                else
+                    final_rule.push_back(grammar::rule_sep);
+
+                for (const auto & tok : rule) final_rule.push_back(tok);
+            }
+
+            for (const auto & rule : new_rules) {
+                if (std::find(rule_matrix.begin(), rule_matrix.end(), rule)
+                        == rule_matrix.end()
+                    and not(rule.size() == 1 and rule.front() == nonterm)) {
+                    // If the rule was not already added
+                    // and it is not a rule of the form "A -> A"
+                    // , add it
+                    final_rule.push_back(grammar::rule_sep);
+                    for (auto tok : rule) { final_rule.push_back(tok); }
+                }
+            }
+
+            output.add_rule(input_nonterm_keys.at(nonterm),
+                            std::move(final_rule));
+        }
+
+        input = std::move(output);
+    }
+
+    return input;
+}

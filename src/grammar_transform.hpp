@@ -10,7 +10,7 @@ std::optional<grammar> remove_left_recursion(const grammar & input);
 grammar make_proper_form(const grammar & input);
 
 grammar remove_epsilon(const grammar & input);
-grammar remove_cycles(const grammar & input);
+grammar remove_unit_productions(grammar  input);
 grammar remove_unreachables(const grammar & input);
 
 #endif

@@ -87,12 +87,12 @@ int main(int arg_count, const char ** args) {
         std::cout << "Could not find cycle\n";
     }
 
-	std::cout << "Making cfg proper\n";
-	auto proper = remove_epsilon(cfg);
+    std::cout << "Making cfg proper\n";
+    auto proper = remove_unit_productions(remove_epsilon(cfg));
 
-    std::cout << std::endl;
+    std::cout << proper << std::endl;
 
-    auto cleaned = remove_left_recursion(cfg);
+    auto cleaned = remove_left_recursion(proper);
 
     if (cleaned) {
         std::cout << "Removed all left recursion from the grammar" << std::endl;
