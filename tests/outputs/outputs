@@ -1,0 +1,6 @@
+cmake-build-debug/check_grammar
+Usage:
+	no args -> filename in stdin
+	-h or --help -> this help message
+	- or -- -> grammar in stdin
+	<filename> -> file read as grammar

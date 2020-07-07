@@ -2,6 +2,7 @@ Using token 1 for nonterminal A
 Using token 2 for nonterminal B
 Using token 3 for nonterminal C
 Using token 4 for nonterminal D
+Successfully parsed grammar
 Symbol mapping (Negative = terminal):
 -3 -->  b
 -2 -->  c
@@ -32,6 +33,48 @@ Epsilon check
 Cycle check
 Found cycle
 1 --> 2 --> 3 --> 4 --> 1
+Making cfg proper
+Symbol mapping (Negative = terminal):
+-3 -->  b
+-2 -->  c
+-1 -->  a
+ 0 -->  |
+ 1 -->  A
+ 2 -->  B
+Rules:
+ 1 -->  1 -1  | -2  2  | -3 -3 
+ 2 -->  1 -1  | -2  2  | -3 -3 
+Rules Prettified:
+ A -->  A  a  |  c  B  |  b  b 
+ B -->  A  a  |  c  B  |  b  b 
 
-Could not clean the grammar
+
+Before immediate recursion removal for nonterm 1(sym A):
+ 1 -1
+ -2 2
+ -3 -3
+Before immediate recursion removal for nonterm 2(sym B):
+ -2 2 3 -1
+ -3 -3 3 -1
+ -2 2
+ -3 -3
+Removed all left recursion from the grammar
+Symbol mapping (Negative = terminal):
+-3 -->  b
+-2 -->  c
+-1 -->  a
+ 0 -->  |
+ 1 -->  A
+ 2 -->  B
+ 3 -->  C
+Rules:
+ 1 --> -2  2  3  | -3 -3  3 
+ 2 --> -2  2  3 -1  | -3 -3  3 -1  | -2  2  | -3 -3 
+ 3 -->  | -1  3 
+Rules Prettified:
+ A -->  c  B  C  |  b  b  C 
+ B -->  c  B  C  a  |  b  b  C  a  |  c  B  |  b  b 
+ C -->  |  a  C 
+
+
 END OF PROGRAM

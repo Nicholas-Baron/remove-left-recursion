@@ -1,40 +1,60 @@
 Using token 1 for nonterminal A
+Successfully parsed grammar
 Symbol mapping (Negative = terminal):
--2 -->  
-
 -1 -->  a
  0 -->  |
  1 -->  A
 Rules:
- 1 -->  1 -1  | -2 
+ 1 -->  1 -1  | 
 Rules Prettified:
- A -->  A  a  |  
- 
+ A -->  A  a  | 
 
 
 Epsilon check
-1 has epsilon? false
+1 has epsilon? true
 
 Cycle check
 Could not find cycle
-
-Before immediate recursion removal for nonterm 1(sym A):
- 1 -1
- -2
-Removed all left recursion from the grammar
+Making cfg proper
+Grammar has been augmented
+Result:
 Symbol mapping (Negative = terminal):
--2 -->  
-
 -1 -->  a
  0 -->  |
  1 -->  A
  2 -->  B
 Rules:
- 1 --> -2  2 
+ 1 --> -1  |  1 -1 
+ 2 -->  1  | 
+Rules Prettified:
+ A -->  a  |  A  a 
+ B -->  A  | 
+
+
+Symbol mapping (Negative = terminal):
+-1 -->  a
+ 0 -->  |
+ 1 -->  A
+Rules:
+ 1 --> -1  |  1 -1 
+Rules Prettified:
+ A -->  a  |  A  a 
+
+
+Before immediate recursion removal for nonterm 1(sym A):
+ -1
+ 1 -1
+Removed all left recursion from the grammar
+Symbol mapping (Negative = terminal):
+-1 -->  a
+ 0 -->  |
+ 1 -->  A
+ 2 -->  B
+Rules:
+ 1 --> -1  2 
  2 -->  | -1  2 
 Rules Prettified:
- A -->  
-  B 
+ A -->  a  B 
  B -->  |  a  B 
 
 

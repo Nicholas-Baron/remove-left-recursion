@@ -1,0 +1,67 @@
+Using token 1 for nonterminal A
+Using token 2 for nonterminal <Beta>
+Successfully parsed grammar
+Symbol mapping (Negative = terminal):
+-3 -->  e
+-2 -->  c
+-1 -->  b
+ 0 -->  |
+ 1 -->  A
+ 2 --> <Beta>
+Rules:
+ 1 -->  2 -1  | -2 
+ 2 -->  1  | -3 
+Rules Prettified:
+ A --> <Beta>  b  |  c 
+<Beta> -->  A  |  e 
+
+
+Epsilon check
+1 has epsilon? false
+2 has epsilon? false
+
+Cycle check
+Could not find cycle
+Making cfg proper
+Symbol mapping (Negative = terminal):
+-3 -->  e
+-2 -->  c
+-1 -->  b
+ 0 -->  |
+ 1 -->  A
+ 2 --> <Beta>
+Rules:
+ 1 -->  2 -1  | -2 
+ 2 -->  1  | -3 
+Rules Prettified:
+ A --> <Beta>  b  |  c 
+<Beta> -->  A  |  e 
+
+
+Before immediate recursion removal for nonterm 1(sym A):
+ 2 -1
+ -2
+Before immediate recursion removal for nonterm 2(sym <Beta>):
+ 2 -1
+ -2
+ -3
+Removed all left recursion from the grammar
+Symbol mapping (Negative = terminal):
+-3 -->  e
+-2 -->  c
+-1 -->  b
+ 0 -->  |
+ 1 -->  A
+ 2 --> <Beta>
+ 3 -->  B
+Rules:
+ 1 -->  2 -1  | -2 
+ 2 --> -2  3  | -3  3 
+ 3 -->  | -1  3 
+Rules Prettified:
+ A --> <Beta>  b  |  c 
+<Beta> -->  c  B  |  e  B 
+ B -->  |  b  B 
+
+
+END OF PROGRAM
