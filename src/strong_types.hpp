@@ -10,7 +10,7 @@ template<typename rep_t, typename tag_t>
 class strong_t final {
    public:
     constexpr strong_t() : internal_rep{} {}
-    explicit constexpr strong_t(rep_t rep) : internal_rep{rep} {}
+    [[maybe_unused]] explicit constexpr strong_t(rep_t rep) : internal_rep{rep} {}
 
     explicit constexpr operator rep_t() const { return internal_rep; }
 

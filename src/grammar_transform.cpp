@@ -188,7 +188,7 @@ grammar remove_epsilon(const grammar & input) {
             // This is done in the form B -> A | empty ; A -> a_1 | a_2
             // where the original rule was A -> empty | a_1 | a_2
 
-            auto initial_sym = input_nonterm_keys.at(nonterms.front());
+            const auto& initial_sym = input_nonterm_keys.at(nonterms.front());
 
             auto initial
                 = output.add_nonterminal(initial_sym, nonterms.front());

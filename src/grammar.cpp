@@ -279,7 +279,7 @@ bool grammar::is_nonterminal_symbol(symbol_t symbol) const {
         return false;
 }
 
-bool grammar::is_terminal_symbol(symbol_t symbol) const {
+[[maybe_unused]] bool grammar::is_terminal_symbol(symbol_t symbol) const {
     if (auto iter = std::find_if(
             symbols.begin(), symbols.end(),
             [&symbol](auto & entry) { return entry.second == symbol; });

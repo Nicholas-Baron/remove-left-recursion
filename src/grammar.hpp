@@ -48,7 +48,7 @@ class grammar {
         token_t nonterminal) const;
 
     [[nodiscard]] auto nonterminal_count() const { return rules.size(); }
-    [[nodiscard]] auto terminal_count() const {
+    [[maybe_unused]] [[nodiscard]] auto terminal_count() const {
         return symbols.size() - (1 + nonterminal_count());
     }
 
@@ -87,7 +87,7 @@ class grammar {
 
     [[nodiscard]] bool is_nonterminal_symbol(symbol_t symbol) const;
 
-    [[nodiscard]] bool is_terminal_symbol(symbol_t symbol) const;
+    [[maybe_unused]] [[nodiscard]] bool is_terminal_symbol(symbol_t symbol) const;
 
     [[nodiscard]] std::vector<token_t> nonterminals() const;
 
