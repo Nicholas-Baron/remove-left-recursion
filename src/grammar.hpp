@@ -37,8 +37,11 @@ class grammar {
         return symbol_t{"|"};
     };
 
-    static grammar                empty() { return grammar{}; }
-    static std::optional<grammar> parse_from_file(const std::string & data);
+    static grammar                              empty() { return grammar{}; }
+    [[nodiscard]] static std::optional<grammar> parse_from_file(
+        const std::string & data);
+    // Create a new grammar with the same nonterminals as the input
+    [[nodiscard]] static grammar copy_terminals_from(const grammar &);
 
     // Returns each rule as its own vector
     [[nodiscard]] std::vector<std::vector<token_t>> rule_matrix(
@@ -110,7 +113,7 @@ class grammar {
     [[nodiscard]] symbol_t next_nonterminal_symbol() const;
 
    private:
-    explicit grammar() = default;
+    [[nodiscard]] explicit grammar() = default;
     std::map<token_t, symbol_t> symbols{{rule_sep, rule_sep_char()}};
     std::map<token_t, std::vector<token_t>> rules{};
 

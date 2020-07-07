@@ -37,13 +37,9 @@ std::optional<grammar> remove_left_recursion(const grammar & input) {
         return {};
     }
 
-    auto              output             = grammar::empty();
+    auto              output             = grammar::copy_terminals_from(input);
     const auto        input_nonterm_keys = input.nonterminal_keys();
     const std::vector nonterms           = input.nonterminals();
-
-    for (const auto & entry : input.terminal_keys())
-        if (output.add_terminal(entry.second, entry.first) != entry.first)
-            std::cout << entry.second << " has been remapped\n";
 
     for (const auto & entry : input.nonterminal_keys())
         if (output.add_nonterminal(entry.second, entry.first) != entry.first)
@@ -171,27 +167,16 @@ std::optional<grammar> remove_left_recursion(const grammar & input) {
 }
 
 grammar make_proper_form(const grammar & input) {
-    // remove epsilon
-
-    // remove cycles
-
-    // remove unproductive symbols
-
-    // remove unreachable symbols
+    // TODO: remove unproductive symbols?
     return remove_unreachables(remove_unit_productions(remove_epsilon(input)));
 }
 
 grammar remove_epsilon(const grammar & input) {
     if (not input.has_any_empty_production()) return input;
 
-    auto              output             = grammar::empty();
+    auto              output             = grammar::copy_terminals_from(input);
     const auto        input_nonterm_keys = input.nonterminal_keys();
     const std::vector nonterms           = input.nonterminals();
-
-    // Copy over the terminals
-    for (const auto & term : input.terminal_keys())
-        if (output.add_terminal(term.second, term.first) != term.first)
-            std::cout << term.second << " was remapped!\n";
 
     // If the first symbol has epsilon, check if it is used anywhere
     if (input.has_empty_production(nonterms.front())) {
@@ -261,14 +246,9 @@ grammar remove_epsilon(const grammar & input) {
 
 grammar remove_unit_productions(grammar input) {
     while (input.has_any_cycle()) {
-        auto              output             = grammar::empty();
+        auto              output = grammar::copy_terminals_from(input);
         const auto        input_nonterm_keys = input.nonterminal_keys();
         const std::vector nonterms           = input.nonterminals();
-
-        // Copy over the terminals
-        for (const auto & term : input.terminal_keys())
-            if (output.add_terminal(term.second, term.first) != term.first)
-                std::cout << term.second << " was remapped!\n";
 
         for (const auto & nonterm : nonterms) {
             auto rule_matrix = input.rule_matrix(nonterm);
@@ -324,14 +304,9 @@ grammar remove_unit_productions(grammar input) {
 }
 
 grammar remove_unreachables(const grammar & input) {
-    auto              output             = grammar::empty();
+    auto              output             = grammar::copy_terminals_from(input);
     const auto        input_nonterm_keys = input.nonterminal_keys();
     const std::vector nonterms           = input.nonterminals();
-
-    // Copy over the terminals
-    for (const auto & term : input.terminal_keys())
-        if (output.add_terminal(term.second, term.first) != term.first)
-            std::cout << term.second << " was remapped!\n";
 
     // Save all reachable nonterminals
     std::vector reachable{nonterms.front()};

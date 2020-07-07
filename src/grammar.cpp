@@ -445,3 +445,13 @@ token_t grammar::add_nonterminal(const symbol_t & symbol, token_t nonterm) {
 
     return this->get_nonterminal(symbol);
 }
+grammar grammar::copy_terminals_from(const grammar & input) {
+    auto output = grammar{};
+
+    // Copy over the terminals
+    for (const auto & term : input.terminal_keys())
+        if (output.add_terminal(term.second, term.first) != term.first)
+            std::cout << term.second << " was remapped!\n";
+
+    return output;
+}
