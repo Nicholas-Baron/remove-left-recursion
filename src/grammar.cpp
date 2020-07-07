@@ -38,9 +38,9 @@ std::optional<grammar> grammar::parse_from_file(const std::string & data) {
                     ++iter;
 
                     if (*iter == '<' or *iter == ';'
-                        or *iter == grammar::rule_sep
-						or *iter == '\n') {
-                        std::cerr << "Cannot use ';', '<', '|', or newline in a symbol "
+                        or *iter == grammar::rule_sep or *iter == '\n') {
+                        std::cerr << "Cannot use ';', '<', '|', or newline in "
+                                     "a symbol "
                                      "name\nOffending name:"
                                   << symbol << std::endl;
                         return std::optional<std::string>{};
@@ -65,7 +65,7 @@ std::optional<grammar> grammar::parse_from_file(const std::string & data) {
     while (iter < data.end()) {
         // Remove initial whitespace
         consume_whitespace();
-		if(iter >= data.end()) break;
+        if (iter >= data.end()) break;
 
         // Read initial symbol
         if (auto symbol = consume_symbol();
@@ -120,7 +120,7 @@ std::optional<grammar> grammar::parse_from_file(const std::string & data) {
                         << std::string{data.begin(), iter} << std::endl;
                 return std::optional<grammar>{};
             }
-			consume_whitespace();
+            consume_whitespace();
         }
 
         to_ret.rules.emplace(nonterm, std::move(rule_list));
@@ -128,7 +128,7 @@ std::optional<grammar> grammar::parse_from_file(const std::string & data) {
         line_num++;
     }
 
-	std::cout << "Successfully parsed grammar\n";
+    std::cout << "Successfully parsed grammar\n";
     return to_ret;
 }
 

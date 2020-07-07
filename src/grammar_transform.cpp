@@ -318,7 +318,8 @@ grammar remove_unreachables(const grammar & input) {
                 // If a token is reachable, a nonterminal, and is not already
                 // reachable, add it to the list of reachables
                 if (contains(nonterms.begin(), nonterms.end(), token)
-                    and not contains(reachable.begin(), reachable.end(), token)) {
+                    and not contains(reachable.begin(), reachable.end(),
+                                     token)) {
                     reachable.push_back(token);
                 }
             }
