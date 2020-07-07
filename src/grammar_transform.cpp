@@ -260,9 +260,13 @@ grammar remove_unit_productions(grammar input) {
                 if (iter->size() == 1
                     and contains(nonterms.begin(), nonterms.end(),
                                  dest_nonterm)) {
-                    auto last_iter = iter - 1;
-                    rule_matrix.erase(iter);
-                    iter = last_iter;
+                    if (auto last_iter = iter - 1;
+                        iter == rule_matrix.begin()) {
+                        iter = rule_matrix.erase(iter);
+                    } else {
+                        rule_matrix.erase(iter);
+                        iter = last_iter;
+                    }
                     for (const auto & dest_rule :
                          input.rule_matrix(dest_nonterm))
                         new_rules.emplace_back(dest_rule);
